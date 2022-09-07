@@ -42,7 +42,7 @@ connection.connect(err => {
 
     app.get('/nonce', (req, res) => {
         console.log('/nonce hit')
-        //res.setHeader('Content-Type', 'text/plain')
+        res.setHeader('Content-Type', 'text/plain')
         res.send({ nonce: generateNonce(), csrfToken: req.csrfToken() })
     })
 
@@ -54,7 +54,8 @@ connection.connect(err => {
             await siweMessage.validate(signature)
             req.session.signature = signature
             res.send(req.session.signature)
-        } catch {
+        } catch (error) {
+            console.log(error)
             res.send(false)
         }
     })

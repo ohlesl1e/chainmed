@@ -37,11 +37,12 @@
     };
 
     const signInWithEthereum = async () => {
-        const message = await createSiweMessage(
+        const { message, csrfToken } = await createSiweMessage(
             await signer.getAddress(),
             "Sign in with Ethereum to the App"
         );
-        const signature = await signer.signMessage(message.message);
+
+        const signature = await signer.signMessage(message);
 
         const res = await axios.post(
             `${BACKEND_ADDR}/login`,
@@ -49,7 +50,7 @@
             {
                 headers: {
                     "Content-Type": "application/json",
-                    "xsrf-token": message.csrfToken,
+                    "xsrf-token": csrfToken,
                 },
                 withCredentials: true,
             }
