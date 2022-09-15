@@ -31,8 +31,11 @@ app.use(csrf())
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: ''
+    password: '',
+    database: 'mydb',
 })
+
+const USER_TABLE_WHITELIST = ['doctor', 'patient']
 
 connection.connect(err => {
     if (err) {
@@ -48,15 +51,42 @@ connection.connect(err => {
 
     app.post('/login', async (req, res) => {
         console.log('/login hit')
-        const { message, signature } = req.body
+        // login process start
+        const { message, signature, type } = req.body
         const siweMessage = new SiweMessage(message)
         try {
+            // validate signature
             await siweMessage.validate(signature)
-            req.session.signature = signature
-            res.send(req.session.signature)
+            console.log({ type, wallet: siweMessage.address })
+            req.session.address = siweMessage.address
+
+            // check user exist
+            if (USER_TABLE_WHITELIST.includes(type)) {
+                connection.execute(`SELECT * FROM ${type} WHERE user_wallet = ?`, [siweMessage.address], (err, results, fields) => {
+                    if (err) {
+                        console.log(err);
+                        return res.status(500).send("Internal error")
+                    }
+
+                    if (results.length !== 0) {
+                        console.log(results[0]["patient_profile"])
+                        if (type == 'patient') {
+                            req.session.profile = results[0]["patient_profile"]
+                        }
+                        return res.status(200).send("Login success")
+                    }
+                    return res.status(404).send("Profile not found")
+                })
+            } else {
+                return res.status(403).send("Invalid user type")
+            }
         } catch {
-            res.send(false)
+            return res.status(403).send("Invalid signature")
         }
+    })
+
+    app.post('/create', (req, res) => {
+        const { address, profile } = req.body
     })
 
     app.options('*', cors())
