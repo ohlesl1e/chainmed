@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express')
 const session = require('express-session')
 const { createClient } = require('redis')
@@ -31,7 +32,7 @@ app.use(csrf())
 const connection = mysql.createConnection({
     host: 'localhost',
     user: 'root',
-    password: '',
+    password: process.env.DB_PASS,
     database: 'mydb',
 })
 
