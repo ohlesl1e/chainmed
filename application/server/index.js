@@ -47,7 +47,7 @@ connection.connect(err => {
     app.get('/nonce', (req, res) => {
         console.log('/nonce hit')
         //res.setHeader('Content-Type', 'text/plain')
-        res.send({ nonce: generateNonce(), csrfToken: req.csrfToken() })
+        return res.send({ nonce: generateNonce(), csrfToken: req.csrfToken() })
     })
 
     app.post('/login', async (req, res) => {
@@ -74,9 +74,9 @@ connection.connect(err => {
                         if (type == 'patient') {
                             req.session.profile = results[0]["patient_profile"]
                         }
-                        return res.status(200).send("Login success")
+                        return res.status(200).send({ message: "Login success", type })
                     }
-                    return res.status(404).send("Profile not found")
+                    return res.status(404).header({location:'/new-patient'}).send("Profile not found")
                 })
             } else {
                 return res.status(403).send("Invalid user type")

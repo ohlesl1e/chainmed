@@ -1,10 +1,21 @@
-import { defineConfig } from 'vite'
-import { svelte } from '@sveltejs/vite-plugin-svelte'
+import { sveltekit } from '@sveltejs/kit/vite';
+import { extractorSvelte, presetAttributify, presetUno } from 'unocss';
+import UnoCss from 'unocss/vite';
 
-// https://vitejs.dev/config/
-export default defineConfig({
-    plugins: [svelte()],
+const config = {
+    plugins: [
+        sveltekit(),
+        UnoCss({
+            extractors: [extractorSvelte],
+            shortcuts: {},
+            presets: [
+                presetUno(),
+                presetAttributify()
+            ]
+        })
+    ],
     server: {
+        host: true,
         proxy: {
             '/api': {
                 target: 'http://localhost:4000',
@@ -14,4 +25,6 @@ export default defineConfig({
             }
         },
     }
-})
+};
+
+export default config;

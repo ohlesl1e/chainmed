@@ -9,7 +9,7 @@
 
 <header>
 	<div class="corner">
-		<a href="https://kit.svelte.dev">
+		<a href="/">
 			<img src={logo} alt="SvelteKit" />
 		</a>
 	</div>
@@ -19,14 +19,14 @@
 			<path d="M0,0 L1,2 C1.5,3 1.5,3 2,3 L2,0 Z" />
 		</svg>
 		<ul>
-			<li class:active={$page.url.pathname === '/'}>
+			<li class:active={$page.url.pathname === ('/' || '/dashboard')}>
 				<a href="/">Home</a>
 			</li>
 			<li class:active={$page.url.pathname === '/account'}>
 				<a href="/account">Account</a>
 			</li>
 			<li class:active={$page.url.pathname === '/prescribe'}>
-				<a href="/prescribe">Todos</a>
+				<a href="/prescribe">Prescribe</a>
 			</li>
 		</ul>
 		<svg viewBox="0 0 2 3" aria-hidden="true">
@@ -52,8 +52,8 @@
 	.corner {
 		width: 10em;
 		height: 3em;
-        display: flex;
-        align-items: center;
+		display: flex;
+		align-items: center;
 	}
 
 	.corner a {
