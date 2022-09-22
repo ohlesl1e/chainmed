@@ -4,8 +4,8 @@
     import { ethers } from 'ethers';
     import { SiweMessage } from 'siwe';
     import axios from 'axios';
-    import { getContext } from 'svelte';
-	import { goto } from '$app/navigation';
+    import { getContext, onMount } from 'svelte';
+    import { goto } from '$app/navigation';
 
     const domain = window.location.host;
     const origin = window.location.origin;
@@ -13,9 +13,15 @@
     const signer = provider ? provider.getSigner() : undefined;
     const BACKEND_ADDR = '/api';
 
+    onMount(() => {
+        if (sessionStorage.getItem('userType')) {
+            goto('/dashboard');
+        }
+    });
+
     const createSiweMessage = async (address, statement) => {
         const res = await axios.get(`${BACKEND_ADDR}/nonce`, {
-            withCredentials: true
+            withCredentials: true,
         });
         const message = new SiweMessage({
             domain,
@@ -24,12 +30,12 @@
             uri: origin,
             version: '1',
             chainId: 1,
-            nonce: res.data.nonce
+            nonce: res.data.nonce,
         });
 
         return {
             message: message.prepareMessage(),
-            csrfToken: res.data.csrfToken
+            csrfToken: res.data.csrfToken,
         };
     };
 
@@ -47,12 +53,15 @@
                 {
                     headers: {
                         'Content-Type': 'application/json',
-                        'xsrf-token': csrfToken
+                        'xsrf-token': csrfToken,
                     },
-                    withCredentials: true
+                    withCredentials: true,
                 }
             )
-            .then((res) => console.log(res.data))
+            .then((res) => {
+                console.log(res.data);
+                sessionStorage.setItem('userType', type);
+            })
             .catch((err) => {
                 console.log(err);
                 switch (err.response.status) {
@@ -60,7 +69,7 @@
                         if (type === 'doctor') {
                             alert('Login failed. Please try again');
                         } else {
-                            goto(err.response.headers.location)
+                            goto(err.response.headers.location);
                         }
                         break;
 
@@ -79,22 +88,24 @@
         <div>
             <h2>For Patient</h2>
             <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla eu ex sed sem hendrerit
-                accumsan. In hac habitasse platea dictumst. Lorem ipsum dolor sit amet, consectetur
-                adipiscing elit. Sed mi nisi, viverra non eros ut, vestibulum imperdiet ante. Duis nulla
-                metus, sollicitudin et augue nec, vulputate rhoncus tellus. Sed placerat urna eu ex bibendum
-                hendrerit. Proin a gravida eros, dignissim scelerisque neque.
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla eu ex sed sem
+                hendrerit accumsan. In hac habitasse platea dictumst. Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit. Sed mi nisi, viverra non eros ut, vestibulum imperdiet
+                ante. Duis nulla metus, sollicitudin et augue nec, vulputate rhoncus tellus. Sed
+                placerat urna eu ex bibendum hendrerit. Proin a gravida eros, dignissim scelerisque
+                neque.
             </p>
             <button on:click={() => signInWithEthereum('patient')}>Patient Login</button>
         </div>
         <div>
             <h2>For Doctor</h2>
             <p>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla eu ex sed sem hendrerit
-                accumsan. In hac habitasse platea dictumst. Lorem ipsum dolor sit amet, consectetur
-                adipiscing elit. Sed mi nisi, viverra non eros ut, vestibulum imperdiet ante. Duis nulla
-                metus, sollicitudin et augue nec, vulputate rhoncus tellus. Sed placerat urna eu ex bibendum
-                hendrerit. Proin a gravida eros, dignissim scelerisque neque.
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nulla eu ex sed sem
+                hendrerit accumsan. In hac habitasse platea dictumst. Lorem ipsum dolor sit amet,
+                consectetur adipiscing elit. Sed mi nisi, viverra non eros ut, vestibulum imperdiet
+                ante. Duis nulla metus, sollicitudin et augue nec, vulputate rhoncus tellus. Sed
+                placerat urna eu ex bibendum hendrerit. Proin a gravida eros, dignissim scelerisque
+                neque.
             </p>
             <button on:click={() => signInWithEthereum('doctor')}>Doctor Login</button>
         </div>

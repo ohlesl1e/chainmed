@@ -70,7 +70,6 @@ connection.connect(err => {
                     }
 
                     if (results.length !== 0) {
-                        console.log(results[0]["patient_profile"])
                         if (type == 'patient') {
                             req.session.profile = results[0]["patient_profile"]
                         }

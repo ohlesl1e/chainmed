@@ -22,6 +22,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@openzeppelin/contracts": "^4.7.3",
 		"axios": "^0.27.2",
 		"ethers": "^5.5.1",
 		"siwe": "^1.1.6",
