@@ -1,4 +1,4 @@
-<script type="module">
+<script>
 	import 'uno.css';
 	import Header from '$lib/Header.svelte';
 	import { ethers } from 'ethers';
