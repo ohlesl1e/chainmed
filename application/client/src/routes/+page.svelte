@@ -61,6 +61,7 @@
             .then((res) => {
                 console.log(res.data);
                 sessionStorage.setItem('userType', type);
+                goto('/dash')
             })
             .catch((err) => {
                 console.log(err);

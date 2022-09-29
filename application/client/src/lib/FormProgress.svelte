@@ -37,7 +37,7 @@
   }
 </script>
 
-<div class="progress-container m-t-6" bind:this={circles}>
+<div class="progress-container" bind:this={circles}>
   <div class="progress" bind:this={progress} />
   {#each steps as step, i}
     <div class="circle {i === 0 ? 'active' : ''}" data-title={step}>{i + 1}</div>

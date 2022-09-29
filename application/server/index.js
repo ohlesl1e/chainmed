@@ -75,7 +75,7 @@ connection.connect(err => {
                         }
                         return res.status(200).send({ message: "Login success", type })
                     }
-                    return res.status(404).header({location:'/new-patient'}).send("Profile not found")
+                    return res.status(404).header({ location: '/new-patient' }).send("Profile not found")
                 })
             } else {
                 return res.status(403).send("Invalid user type")
@@ -87,6 +87,18 @@ connection.connect(err => {
 
     app.post('/create', (req, res) => {
         const { address, profile } = req.body
+    })
+
+    app.get('/search_med', (req, res) => {
+        console.log(req.query);
+        let query = `%${req.query.search.split(' ').join('%')}%`
+        connection.execute('SELECT PROPRIETARYNAME,NONPROPRIETARYNAME,MARKETINGCATEGORYNAME,LABELERNAME,SUBSTANCENAME,ACTIVE_NUMERATOR_STRENGTH,ACTIVE_INGRED_UNIT,PHARM_CLASSES FROM medicine WHERE PROPRIETARYNAME LIKE ? OR NONPROPRIETARYNAME LIKE ?', [query, query], (err, result, fields) => {
+            if (err) {
+                console.error(err);
+            }
+            console.log(result.length);
+            return res.send(result)
+        })
     })
 
     app.options('*', cors())
