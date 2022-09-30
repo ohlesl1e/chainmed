@@ -1,68 +1,112 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-struct Dosage {
-    uint32 strength;
-    byte32 unit;
-}
+contract CDTreatment is ERC20, AccessControl {
+    struct Dosage {
+        uint16 strength;
+        bytes16 unit;
+    }
 
-enum Frequency {
-    Interval,
-    DaysOfWeek,
-    AsNeeded
-}
+    enum Frequency {
+        Interval,
+        DaysOfWeek,
+        AsNeeded
+    }
 
-struct Schedule {
-    Frenquency frequency;
-    uint8 interval;
-    bytes16[7] daysOfWeek;
-    unit8[] timesOfDay;
-}
+    struct Schedule {
+        uint256 startDate;
+        uint256 endDate;
+        Frequency frequency;
+        uint8 interval;
+        bytes16[] daysOfWeek;
+        uint8[] timesOfDay;
+    }
 
-contract CDTreatment is ERC721, ERC721Enumerable, AccessControl {
-    bytes32 public constant MINTER_ROLE = keccak256("MINTER_ROLE");
     bytes32 public constant PATIENT_ROLE = keccak256("PATIENT_ROLE");
+    address private patient;
     string private medicine;
-    string private form;
+    bytes32 private form;
     Dosage private dosage;
     Schedule private schedule;
 
-    constructor() ERC721("CDTreatment", "CDT") {
+    constructor(
+        address patient_,
+        string memory medicine_,
+        bytes32 form_,
+        Dosage memory dosage_,
+        Schedule memory schedule_
+    ) ERC20("CDTreatment", "CDT") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
-        _grantRole(MINTER_ROLE, msg.sender);
+        _grantRole(PATIENT_ROLE, patient_);
+
+        patient = patient_;
+        medicine = medicine_;
+        form = form_;
+        dosage = dosage_;
+        schedule = schedule_;
     }
 
-    function safeMint(address to, uint256 tokenId)
-        public
-        onlyRole(MINTER_ROLE)
-    {
-        _safeMint(to, tokenId);
+    modifier onlyCompleted() {
+        require(this.isComplete());
+        _;
     }
 
-    // The following functions are overrides required by Solidity.
-
-    function _beforeTokenTransfer(
-        address from,
-        address to,
-        uint256 tokenId
-    ) internal override(ERC721, ERC721Enumerable) {
-        super._beforeTokenTransfer(from, to, tokenId);
-    }
-
-    function supportsInterface(bytes4 interfaceId)
+    function getTreatment()
         public
         view
-        override(ERC721, ERC721Enumerable, AccessControl)
-        returns (bool)
+        returns (
+            string memory,
+            bytes32,
+            Dosage memory,
+            Schedule memory
+        )
     {
-        return super.supportsInterface(interfaceId);
+        string memory medicine_ = medicine;
+        Dosage memory dosage_ = dosage;
+        Schedule memory schedule_ = schedule;
+        return (medicine_, form, dosage_, schedule_);
     }
 
-    function getTreatment() view public returns (string, string, Dosage, Schedule) {
-        return (medicine, form, dosage, schedule);
+    function isComplete() public view returns (bool) {
+        return schedule.endDate < block.timestamp;
+    }
+
+    function edit(string memory medicine_) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        medicine = medicine_;
+    }
+
+    function edit(bytes32 form_) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        form = form_;
+    }
+
+    function edit(Dosage memory dosage_) public onlyRole(DEFAULT_ADMIN_ROLE) {
+        dosage = dosage_;
+    }
+
+    function edit(Schedule memory schedule_)
+        public
+        onlyRole(DEFAULT_ADMIN_ROLE)
+    {
+        schedule = schedule_;
+    }
+
+    function reset(
+        address patient_,
+        string memory medicine_,
+        bytes32 form_,
+        Dosage memory dosage_,
+        Schedule memory schedule_
+    ) public onlyCompleted onlyRole(DEFAULT_ADMIN_ROLE) {
+        _revokeRole(PATIENT_ROLE, patient);
+        _grantRole(PATIENT_ROLE, patient_);
+
+        patient = patient_;
+        medicine = medicine_;
+        form = form_;
+        dosage = dosage_;
+        schedule = schedule_;
     }
 }
