@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract CDTreatment is ERC20, AccessControl {
+contract CDTreatment is AccessControl {
     struct Dosage {
         uint16 strength;
         bytes16 unit;
@@ -17,12 +16,12 @@ contract CDTreatment is ERC20, AccessControl {
     }
 
     struct Schedule {
-        uint256 startDate;
-        uint256 endDate;
+        uint startDate;
+        uint endDate;
         Frequency frequency;
         uint8 interval;
         bytes16[] daysOfWeek;
-        uint8[] timesOfDay;
+        uint16[] timesOfDay;
     }
 
     bytes32 public constant PATIENT_ROLE = keccak256("PATIENT_ROLE");
@@ -38,7 +37,9 @@ contract CDTreatment is ERC20, AccessControl {
         bytes32 form_,
         Dosage memory dosage_,
         Schedule memory schedule_
-    ) ERC20("CDTreatment", "CDT") {
+    ) {
+        _setRoleAdmin(PATIENT_ROLE, DEFAULT_ADMIN_ROLE);
+
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
         _grantRole(PATIENT_ROLE, patient_);
 
@@ -47,6 +48,14 @@ contract CDTreatment is ERC20, AccessControl {
         form = form_;
         dosage = dosage_;
         schedule = schedule_;
+    }
+
+    modifier canRead() {
+        require(
+            hasRole(PATIENT_ROLE, msg.sender) ||
+                hasRole(DEFAULT_ADMIN_ROLE, msg.sender)
+        );
+        _;
     }
 
     modifier onlyCompleted() {

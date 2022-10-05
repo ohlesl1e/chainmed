@@ -4,7 +4,14 @@
     import moment from 'moment';
     import FormProgress from '$lib/FormProgress.svelte';
     import { stopTyping } from '$lib/onStopTyping';
-    import { onMount } from 'svelte';
+    import { onMount, getContext } from 'svelte';
+    import CDPatient from '$lib/contracts/CDPatient.json';
+    import CDManager from '$lib/contracts/CDManager.json';
+    import { ethers } from 'ethers';
+
+    const provider = getContext('provider');
+    const MANAGER_ADDRESS = '0x1d84248Cc15b9d9443D550c181D0473c4b17E0a1';
+    const manager = new ethers.Contract(MANAGER_ADDRESS, CDManager.abi, provider);
 
     const BACKEND_ADDR = '/api';
     let steps = ['patient', 'medicine', 'form', 'dosage', 'schedule', 'review'];
@@ -40,6 +47,7 @@
     let progressBar;
 
     let patient;
+    let info;
     let medicine;
     let form = '';
     let dosage = {
@@ -60,6 +68,39 @@
     };
 
     onMount(() => calculateEndDate());
+
+    const getPatientInfo = async (e) => {
+        e.preventDefault();
+        let patientAddress = await manager.getPatient(patient);
+        let patientContract = new ethers.Contract(
+            patientAddress,
+            CDPatient.abi,
+            provider.getSigner()
+        );
+        patientContract
+            .getInfo()
+            .then((res) => {
+                console.log(ethers.BigNumber.from(res[2]._hex));
+                info = {
+                    name: ethers.utils.parseBytes32String(res[0]),
+                    gender: ethers.utils.parseBytes32String(res[1]),
+                    age:
+                        new Date().getFullYear() -
+                        new Date(ethers.BigNumber.from(res[2]._hex) * 1000).getFullYear(),
+                    height: res[3],
+                    weight: res[4],
+                    allergy: res[5],
+                    alcohol: res[6],
+                    smoke: res[7],
+                    cannabis: res[8],
+                    treatment: res[9],
+                };
+            })
+            .catch((err) => {
+                console.log(err);
+                info = null;
+            });
+    };
 
     const handleProgress = (n) => {
         progressBar.handleProgress(n);
@@ -127,14 +168,67 @@
             <!-- patient -->
             <div class="form-step">
                 <h2 class="m-t-0">Patient wallet address</h2>
-                <div class="form-group flex flex-col gap-4">
+                <div class="form-group flex flex-col gap-4 mb-3">
                     <input
                         type="text"
                         placeholder="e.g. 0x71C7656EC7ab88b098defB751B7401B5f6d8976F"
                         bind:value={patient}
                         on:input={validatePatient}
                     />
+                    <button type="button" on:click={(e) => getPatientInfo(e)}>Search</button>
                 </div>
+                {#if info}
+                    <div class="flex flex-row justify-around">
+                        <div class="flex flex-col gap-2">
+                            <div class="flex flex-row gap-2">
+                                <h3 class="m-1">Name:</h3>
+                                <h4 class="m-1">{info.name}</h4>
+                            </div>
+                            <div class="flex flex-row gap-2">
+                                <h3 class="m-1">Gender:</h3>
+                                <h4 class="m-1">{info.gender}</h4>
+                            </div>
+                            <div class="flex flex-row gap-2">
+                                <h3 class="m-1">Age:</h3>
+                                <h4 class="m-1">{info.age}</h4>
+                            </div>
+                            <div class="flex flex-row gap-2">
+                                <h3 class="m-1">Height:</h3>
+                                <h4 class="m-1">{info.height} cm</h4>
+                            </div>
+                            <div class="flex flex-row gap-2">
+                                <h3 class="m-1">Weight:</h3>
+                                <h4 class="m-1">{info.weight} kg</h4>
+                            </div>
+                        </div>
+                        <div class="flex flex-col gap-2">
+                            <div class="flex flex-row gap-2">
+                                <h3 class="m-1">Allergy:</h3>
+                                <h4 class="m-1">
+                                    {#if info.allergy.length}
+                                        {#each info.allergy as al}
+                                            {ethers.utils.parseBytes32String(al)},
+                                        {/each}
+                                    {:else}
+                                        {'N/A'}
+                                    {/if}
+                                </h4>
+                            </div>
+                            <div class="flex flex-row gap-2">
+                                <h3 class="m-1">Alcohol:</h3>
+                                <h4 class="m-1">{info.alcohol}</h4>
+                            </div>
+                            <div class="flex flex-row gap-2">
+                                <h3 class="m-1">Smokes:</h3>
+                                <h4 class="m-1">{info.smoke}</h4>
+                            </div>
+                            <div class="flex flex-row gap-2">
+                                <h3 class="m-1">Cannabis:</h3>
+                                <h4 class="m-1">{info.cannabis}</h4>
+                            </div>
+                        </div>
+                    </div>
+                {/if}
             </div>
         {:else if currentTab === 1}
             <!-- medicine -->

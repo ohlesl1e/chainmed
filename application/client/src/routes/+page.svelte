@@ -14,7 +14,7 @@
     const BACKEND_ADDR = '/api';
 
     onMount(() => {
-        if (sessionStorage.getItem('userType')) {
+        if (sessionStorage.getItem('token')) {
             goto('/dashboard');
         }
     });
@@ -60,8 +60,8 @@
             )
             .then((res) => {
                 console.log(res.data);
-                sessionStorage.setItem('userType', type);
-                goto('/dash')
+                sessionStorage.setItem('token', res.data.token);
+                goto('/dashboard')
             })
             .catch((err) => {
                 console.log(err);

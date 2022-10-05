@@ -10,11 +10,12 @@
 		provider = new ethers.providers.Web3Provider(window.ethereum);
 	}
 
+
 	setContext('provider', provider);
 </script>
 
 <div>
-	<Header {provider} connected={false} />
+	<Header {provider} connected={window.ethereum.isConnected()} />
 </div>
 
 <main class="flex items-center justify-center mx-a px-5">

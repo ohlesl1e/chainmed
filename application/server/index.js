@@ -1,4 +1,5 @@
 require('dotenv').config()
+const fs = require('fs')
 const express = require('express')
 const session = require('express-session')
 const { createClient } = require('redis')
@@ -7,6 +8,16 @@ const mysql = require('mysql2')
 const cors = require('cors')
 const csrf = require('csurf')
 const { generateNonce, SiweMessage } = require('siwe')
+const privateKey = fs.readFileSync('./jwtRS256.key')
+const jwt = require('jsonwebtoken')
+
+const ethers = require('ethers')
+const provider = new ethers.providers.JsonRpcProvider('HTTP://127.0.0.1:7545')
+const signer = provider.getSigner()
+
+const CDManagerAbi = require('./contracts/CDManager.json').abi
+
+const CDManagerContract = new ethers.Contract('0x1d84248Cc15b9d9443D550c181D0473c4b17E0a1', CDManagerAbi, provider)
 
 const redisClient = createClient({
     legacyMode: true
@@ -38,6 +49,13 @@ const connection = mysql.createConnection({
 
 const USER_TABLE_WHITELIST = ['doctor', 'patient']
 
+
+const first = async () => {
+    let blockNumber = await provider.getBlockNumber()
+    let balance = await provider.getBalance(signer.getAddress())
+    console.log({ blockNumber, balance: ethers.utils.formatEther(balance) });
+}
+
 connection.connect(err => {
     if (err) {
         console.error(`error connecting: ${err.stack}`)
@@ -62,31 +80,65 @@ connection.connect(err => {
             req.session.address = siweMessage.address
 
             // check user exist
-            if (USER_TABLE_WHITELIST.includes(type)) {
-                connection.execute(`SELECT * FROM ${type} WHERE user_wallet = ?`, [siweMessage.address], (err, results, fields) => {
-                    if (err) {
-                        console.log(err);
-                        return res.status(500).send("Internal error")
-                    }
-
-                    if (results.length !== 0) {
-                        if (type == 'patient') {
-                            req.session.profile = results[0]["patient_profile"]
+            switch (type) {
+                case 'doctor':
+                    connection.execute(`SELECT * FROM ${type} WHERE user_wallet = ?`, [siweMessage.address], (err, results, fields) => {
+                        if (err) {
+                            console.log(err);
+                            return res.status(500).send("Internal error")
                         }
-                        return res.status(200).send({ message: "Login success", type })
-                    }
-                    return res.status(404).header({ location: '/new-patient' }).send("Profile not found")
-                })
-            } else {
-                return res.status(403).send("Invalid user type")
+
+                        if (results.length !== 0) {
+                            return res.status(200).send({ message: "Login success", token: jwt.sign({ type }, privateKey, { algorithm: 'RS256' }) })
+                        }
+                        return res.status(404).header({ location: '/new-patient' }).send("Profile not found")
+                    })
+                    break;
+                case 'patient':
+                    CDManagerContract.getPatient(siweMessage.address).then(result => {
+                        console.log(result);
+                        if (result !== ethers.constants.AddressZero) {
+                            return res.status(200).send({ message: "Login success", token: jwt.sign({ type }, privateKey, { algorithm: 'RS256' }) })
+                        }
+                        return res.status(404).header({ location: '/new-patient' }).send("Profile not found")
+                    })
+                    break
+                default:
+                    break;
             }
+
+            // if (USER_TABLE_WHITELIST.includes(type)) {
+            //     connection.execute(`SELECT * FROM ${type} WHERE user_wallet = ?`, [siweMessage.address], (err, results, fields) => {
+            //         if (err) {
+            //             console.log(err);
+            //             return res.status(500).send("Internal error")
+            //         }
+
+            //         if (results.length !== 0) {
+            //             if (type == 'patient') {
+            //                 req.session.profile = results[0]["patient_profile"]
+            //             }
+            //             return res.status(200).send({ message: "Login success", type })
+            //         }
+            //         return res.status(404).header({ location: '/new-patient' }).send("Profile not found")
+            //     })
+            // } else {
+            //     return res.status(403).send("Invalid user type")
+            // }
         } catch {
             return res.status(403).send("Invalid signature")
         }
     })
 
-    app.post('/create', (req, res) => {
-        const { address, profile } = req.body
+    app.post('/register', (req, res) => {
+        const { address } = req.body
+        console.log(address);
+        CDManagerContract.getPatient(address).then(result => {
+            if (result !== ethers.constants.AddressZero) {
+                return res.status(200).send({ message: "Registration success", type: 'patient' })
+            }
+            return res.status(404).header({ location: '/new-patient' }).send("Profile not found")
+        })
     })
 
     app.get('/search_med', (req, res) => {
