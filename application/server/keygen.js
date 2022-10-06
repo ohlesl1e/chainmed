@@ -1,4 +1,5 @@
-const crypto = require('crypto')
+const crypto = require('crypto');
+const fs = require('fs');
 
 crypto.generateKeyPair('rsa', {
     modulusLength: 4096,
@@ -14,4 +15,6 @@ crypto.generateKeyPair('rsa', {
     }
 }, (err, pub, pri) => {
     console.log({ err, pub, pri });
+    fs.writeFileSync('./jwtRS256.key', pri)
+    fs.writeFileSync('../client/src/lib/jwtRS256.key.pub', pub)
 })

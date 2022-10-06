@@ -7,16 +7,24 @@ import "./CDTreatment.sol";
 contract CDDoctor is Ownable {
     CDTreatment[] private treatments;
 
+    constructor(address owner_) {
+        _transferOwnership(owner_);
+    }
+
     function findCompleted()
         public
         view
         returns (CDTreatment[] memory treatment)
     {
         CDTreatment[] memory temp = new CDTreatment[](1);
-        for (uint256 i = 0; i < treatments.length; i) {
+        uint256 length = treatments.length;
+        for (uint256 i = 0; i < length; ) {
             if (treatments[i].isComplete()) {
                 temp[0] = treatments[1];
                 return temp;
+            }
+            unchecked {
+                i++;
             }
         }
         return new CDTreatment[](0);
@@ -28,21 +36,21 @@ contract CDDoctor is Ownable {
         bytes32 form_,
         Dosage memory dosage_,
         Schedule memory schedule_
-    ) public onlyOwner returns (CDTreatment treatment, address oldPatient) {
+    ) public returns (CDTreatment treatment, address oldPatient) {
         CDTreatment[] memory completedTreatment = findCompleted();
         address patient;
 
         if (completedTreatment.length == 0) {
             // no completed treatment, create new treatment
-            CDTreatment newTreatment = new CDTreatment(
+            treatment = new CDTreatment(
                 patient_,
                 medicine_,
                 form_,
                 dosage_,
                 schedule_
             );
-            treatments.push(newTreatment);
-            return (newTreatment, address(0));
+            oldPatient = address(0);
+            treatments.push(treatment);
         } else {
             // reuse completed treatment
             patient = completedTreatment[0].getPatient();
@@ -53,7 +61,7 @@ contract CDDoctor is Ownable {
                 dosage_,
                 schedule_
             );
-            return (treatment = completedTreatment[0], patient);
+            treatment = completedTreatment[0];
         }
     }
 }

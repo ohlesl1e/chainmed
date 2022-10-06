@@ -4,13 +4,6 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./CDTreatment.sol";
 
-struct TreatmentStruct {
-    string medicine;
-    bytes32 form;
-    Dosage dosage;
-    Schedule schedule;
-}
-
 contract CDPatient is AccessControl {
     bytes32 public constant PATIENT_ROLE = keccak256("PATIENT_ROLE");
     bytes32 public constant DOCTOR_ROLE = keccak256("DOCTOR_ROLE");
@@ -24,7 +17,7 @@ contract CDPatient is AccessControl {
     bool private alcohol;
     bool private smoke;
     bool private cannabis;
-    CDTreatment[] treatments;
+    CDTreatment[] private treatments;
 
     constructor(
         address owner_,
@@ -53,19 +46,27 @@ contract CDPatient is AccessControl {
     }
 
     modifier canWrite() {
-        require(
-            hasRole(DOCTOR_ROLE, msg.sender) ||
-                hasRole(PATIENT_ROLE, msg.sender)
-        );
+        _canWrite();
         _;
     }
 
     modifier canRead() {
+        _canRead();
+        _;
+    }
+
+    function _canRead() private view {
         require(
             hasRole(DOCTOR_ROLE, msg.sender) ||
                 hasRole(PATIENT_ROLE, msg.sender)
         );
-        _;
+    }
+
+    function _canWrite() private view {
+        require(
+            hasRole(DOCTOR_ROLE, msg.sender) ||
+                hasRole(PATIENT_ROLE, msg.sender)
+        );
     }
 
     function getInfo()
@@ -119,28 +120,15 @@ contract CDPatient is AccessControl {
         view
         returns (uint256 index)
     {
-        for (uint256 i = 0; i < treatments.length; i++) {
+        uint256 length = treatments.length;
+        for (uint256 i = 0; i < length; ) {
             if (treatments[i] == treatment) {
                 return i;
             }
+            unchecked {
+                i++;
+            }
         }
         return treatments.length;
-    }
-
-    function getTreatments() public view returns (TreatmentStruct[] memory) {
-        TreatmentStruct[] memory temp = new TreatmentStruct[](
-            treatments.length
-        );
-
-        for (uint256 i = 0; i < treatments.length; i) {
-            (
-                string memory medicine_,
-                bytes32 form_,
-                Dosage memory dosage_,
-                Schedule memory schedule_
-            ) = treatments[i].getTreatment();
-            temp[i] = TreatmentStruct(medicine_, form_, dosage_, schedule_);
-        }
-        return temp;
     }
 }

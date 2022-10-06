@@ -20,7 +20,7 @@ contract CDManager {
         bool smoke_,
         bool cannabis_
     ) public {
-        CDPatient patient_ = new CDPatient(
+        patients[msg.sender] = new CDPatient(
             msg.sender,
             name_,
             gender_,
@@ -32,11 +32,10 @@ contract CDManager {
             smoke_,
             cannabis_
         );
-        patients[msg.sender] = patient_;
     }
 
     function addDoctor(address id) public {
-        doctors[id] = new CDDoctor();
+        doctors[id] = new CDDoctor(id);
     }
 
     function getPatient(address id) public view returns (CDPatient) {

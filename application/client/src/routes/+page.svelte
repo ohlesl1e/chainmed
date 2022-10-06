@@ -6,6 +6,7 @@
     import axios from 'axios';
     import { getContext, onMount } from 'svelte';
     import { goto } from '$app/navigation';
+    import { API_PREFIX } from "$env/static/public";
 
     const domain = window.location.host;
     const origin = window.location.origin;
@@ -20,7 +21,7 @@
     });
 
     const createSiweMessage = async (address, statement) => {
-        const res = await axios.get(`${BACKEND_ADDR}/nonce`, {
+        const res = await axios.get(`/${API_PREFIX}/nonce`, {
             withCredentials: true,
         });
         const message = new SiweMessage({
@@ -48,7 +49,7 @@
 
         axios
             .post(
-                `${BACKEND_ADDR}/login`,
+                `/${API_PREFIX}/login`,
                 { message, signature, type },
                 {
                     headers: {

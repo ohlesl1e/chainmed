@@ -50,16 +50,20 @@ contract CDTreatment is AccessControl {
     }
 
     modifier canRead() {
-        require(
-            hasRole(PATIENT_ROLE, msg.sender) ||
-                hasRole(DEFAULT_ADMIN_ROLE, msg.sender)
-        );
+        _canRead();
         _;
     }
 
     modifier onlyCompleted() {
-        require(this.isComplete());
+        require(isComplete());
         _;
+    }
+
+    function _canRead( ) private view {
+        require(
+            hasRole(PATIENT_ROLE, msg.sender) ||
+                hasRole(DEFAULT_ADMIN_ROLE, msg.sender)
+        );
     }
 
     function getPatient() public view returns (address) {
