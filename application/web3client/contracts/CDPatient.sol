@@ -4,13 +4,20 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./CDTreatment.sol";
 
+struct TreatmentStruct {
+    string medicine;
+    bytes32 form;
+    Dosage dosage;
+    Schedule schedule;
+}
+
 contract CDPatient is AccessControl {
     bytes32 public constant PATIENT_ROLE = keccak256("PATIENT_ROLE");
     bytes32 public constant DOCTOR_ROLE = keccak256("DOCTOR_ROLE");
 
     bytes32 private name;
     bytes32 private gender;
-    uint private dob;
+    uint256 private dob;
     uint16 private height;
     uint16 private weight;
     string[] private allergy;
@@ -23,7 +30,7 @@ contract CDPatient is AccessControl {
         address owner_,
         bytes32 name_,
         bytes32 gender_,
-        uint dob_,
+        uint256 dob_,
         uint16 height_,
         uint16 weight_,
         string[] memory allergy_,
@@ -67,7 +74,7 @@ contract CDPatient is AccessControl {
         returns (
             bytes32,
             bytes32,
-            uint,
+            uint256,
             uint16,
             uint16,
             string[] memory,
@@ -92,5 +99,48 @@ contract CDPatient is AccessControl {
             cannabis,
             treatments_
         );
+    }
+
+    function addTreatment(CDTreatment newTreatment) public {
+        treatments.push(newTreatment);
+    }
+
+    function removeTreatment(CDTreatment oldTreatment) public {
+        uint256 index = findTreatment(oldTreatment);
+
+        if (index != treatments.length) {
+            treatments[index] = treatments[treatments.length - 1];
+            treatments.pop();
+        }
+    }
+
+    function findTreatment(CDTreatment treatment)
+        private
+        view
+        returns (uint256 index)
+    {
+        for (uint256 i = 0; i < treatments.length; i++) {
+            if (treatments[i] == treatment) {
+                return i;
+            }
+        }
+        return treatments.length;
+    }
+
+    function getTreatments() public view returns (TreatmentStruct[] memory) {
+        TreatmentStruct[] memory temp = new TreatmentStruct[](
+            treatments.length
+        );
+
+        for (uint256 i = 0; i < treatments.length; i) {
+            (
+                string memory medicine_,
+                bytes32 form_,
+                Dosage memory dosage_,
+                Schedule memory schedule_
+            ) = treatments[i].getTreatment();
+            temp[i] = TreatmentStruct(medicine_, form_, dosage_, schedule_);
+        }
+        return temp;
     }
 }

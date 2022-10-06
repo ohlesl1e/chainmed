@@ -10,6 +10,7 @@ const csrf = require('csurf')
 const { generateNonce, SiweMessage } = require('siwe')
 const privateKey = fs.readFileSync('./jwtRS256.key')
 const jwt = require('jsonwebtoken')
+const crypto = require('crypto')
 
 const ethers = require('ethers')
 const provider = new ethers.providers.JsonRpcProvider('HTTP://127.0.0.1:7545')
@@ -82,16 +83,23 @@ connection.connect(err => {
             // check user exist
             switch (type) {
                 case 'doctor':
-                    connection.execute(`SELECT * FROM ${type} WHERE user_wallet = ?`, [siweMessage.address], (err, results, fields) => {
-                        if (err) {
-                            console.log(err);
-                            return res.status(500).send("Internal error")
-                        }
+                    // connection.execute(`SELECT * FROM ${type} WHERE user_wallet = ?`, [siweMessage.address], (err, results, fields) => {
+                    //     if (err) {
+                    //         console.log(err);
+                    //         return res.status(500).send("Internal error")
+                    //     }
 
-                        if (results.length !== 0) {
+                    //     if (results.length !== 0) {
+                    //         return res.status(200).send({ message: "Login success", token: jwt.sign({ type }, privateKey, { algorithm: 'RS256' }) })
+                    //     }
+                    //     return res.status(404).send("Profile not found")
+                    // })
+                    CDManagerContract.getDoctor(siweMessage.address).then(result => {
+                        console.log(result);
+                        if (result !== ethers.constants.AddressZero) {
                             return res.status(200).send({ message: "Login success", token: jwt.sign({ type }, privateKey, { algorithm: 'RS256' }) })
                         }
-                        return res.status(404).header({ location: '/new-patient' }).send("Profile not found")
+                        return res.status(404).send("Profile not found")
                     })
                     break;
                 case 'patient':

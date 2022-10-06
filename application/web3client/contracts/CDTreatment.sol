@@ -2,28 +2,27 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
+struct Dosage {
+    uint16 strength;
+    bytes32 unit;
+}
+
+enum Frequency {
+    Interval,
+    DaysOfWeek,
+    AsNeeded
+}
+
+struct Schedule {
+    uint256 startDate;
+    uint256 endDate;
+    Frequency frequency;
+    uint8 interval;
+    bytes32[] daysOfWeek;
+    uint16[] timesOfDay;
+}
 
 contract CDTreatment is AccessControl {
-    struct Dosage {
-        uint16 strength;
-        bytes16 unit;
-    }
-
-    enum Frequency {
-        Interval,
-        DaysOfWeek,
-        AsNeeded
-    }
-
-    struct Schedule {
-        uint startDate;
-        uint endDate;
-        Frequency frequency;
-        uint8 interval;
-        bytes16[] daysOfWeek;
-        uint16[] timesOfDay;
-    }
-
     bytes32 public constant PATIENT_ROLE = keccak256("PATIENT_ROLE");
     address private patient;
     string private medicine;
@@ -63,6 +62,10 @@ contract CDTreatment is AccessControl {
         _;
     }
 
+    function getPatient() public view returns (address) {
+        return patient;
+    }
+
     function getTreatment()
         public
         view
@@ -80,7 +83,7 @@ contract CDTreatment is AccessControl {
     }
 
     function isComplete() public view returns (bool) {
-        return schedule.endDate < block.timestamp;
+        return schedule.endDate < block.timestamp * 1000;
     }
 
     function edit(string memory medicine_) public onlyRole(DEFAULT_ADMIN_ROLE) {
