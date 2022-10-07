@@ -1,18 +1,14 @@
 <script>
-    import svelteLogo from '../assets/svelte.svg';
-    import viteLogo from '../assets/vite.svg';
-    import { ethers } from 'ethers';
     import { SiweMessage } from 'siwe';
     import axios from 'axios';
     import { getContext, onMount } from 'svelte';
     import { goto } from '$app/navigation';
-    import { API_PREFIX } from "$env/static/public";
+    import { PUBLIC_API_PREFIX } from "$env/static/public";
 
     const domain = window.location.host;
     const origin = window.location.origin;
     const provider = getContext('provider');
     const signer = provider ? provider.getSigner() : undefined;
-    const BACKEND_ADDR = '/api';
 
     onMount(() => {
         if (sessionStorage.getItem('token')) {
@@ -21,7 +17,7 @@
     });
 
     const createSiweMessage = async (address, statement) => {
-        const res = await axios.get(`/${API_PREFIX}/nonce`, {
+        const res = await axios.get(`/${PUBLIC_API_PREFIX}/nonce`, {
             withCredentials: true,
         });
         const message = new SiweMessage({
@@ -49,7 +45,7 @@
 
         axios
             .post(
-                `/${API_PREFIX}/login`,
+                `/${PUBLIC_API_PREFIX}/login`,
                 { message, signature, type },
                 {
                     headers: {

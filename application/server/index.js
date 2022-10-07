@@ -10,15 +10,16 @@ const csrf = require('csurf')
 const { generateNonce, SiweMessage } = require('siwe')
 const privateKey = fs.readFileSync('./jwtRS256.key')
 const jwt = require('jsonwebtoken')
-const crypto = require('crypto')
 
 const ethers = require('ethers')
 const provider = new ethers.providers.JsonRpcProvider('HTTP://127.0.0.1:7545')
 const signer = provider.getSigner()
 
-const CDManagerAbi = require('./contracts/CDManager.json').abi
+const CDDoctorManager = require('./contracts/CDDoctorManager.json')
+const CDPatientManager = require('./contracts/CDPatientManager.json')
 
-const CDManagerContract = new ethers.Contract('0x1d84248Cc15b9d9443D550c181D0473c4b17E0a1', CDManagerAbi, provider)
+const DoctorManagerContract = new ethers.Contract(process.env.DM_ADDRESS, CDDoctorManager.abi, provider)
+const PatientManagerContract = new ethers.Contract(process.env.PM_ADDRESS, CDPatientManager.abi, provider)
 
 const redisClient = createClient({
     legacyMode: true
@@ -94,7 +95,7 @@ connection.connect(err => {
                     //     }
                     //     return res.status(404).send("Profile not found")
                     // })
-                    CDManagerContract.getDoctor(siweMessage.address).then(result => {
+                    DoctorManagerContract.getDoctor(siweMessage.address).then(result => {
                         console.log(result);
                         if (result !== ethers.constants.AddressZero) {
                             return res.status(200).send({ message: "Login success", token: jwt.sign({ type }, privateKey, { algorithm: 'RS256' }) })
@@ -103,7 +104,7 @@ connection.connect(err => {
                     })
                     break;
                 case 'patient':
-                    CDManagerContract.getPatient(siweMessage.address).then(result => {
+                    PatientManagerContract.getPatient(siweMessage.address).then(result => {
                         console.log(result);
                         if (result !== ethers.constants.AddressZero) {
                             return res.status(200).send({ message: "Login success", token: jwt.sign({ type }, privateKey, { algorithm: 'RS256' }) })
@@ -141,7 +142,7 @@ connection.connect(err => {
     app.post('/register', (req, res) => {
         const { address } = req.body
         console.log(address);
-        CDManagerContract.getPatient(address).then(result => {
+        PatientManagerContract.getPatient(address).then(result => {
             if (result !== ethers.constants.AddressZero) {
                 return res.status(200).send({ message: "Registration success", type: 'patient' })
             }

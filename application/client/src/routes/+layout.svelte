@@ -1,50 +1,57 @@
 <script>
-	import 'uno.css';
-	import Header from '$lib/Header.svelte';
-	import { ethers } from 'ethers';
-	import { setContext } from 'svelte';
+    import 'uno.css';
+    import Header from '$lib/Header.svelte';
+    import { ethers } from 'ethers';
+    import { setContext } from 'svelte';
+    import { PUBLIC_DM_ADDRESS, PUBLIC_PM_ADDRESS } from '$env/static/public';
+    import CDDoctorManager from '$lib/contracts/CDDoctorManager.json';
+    import CDPatientManager from '$lib/contracts/CDPatientManager.json';
 
-	let provider;
+    let DoctorManager, PatientManager;
+    let provider;
 
-	if (window.ethereum) {
-		provider = new ethers.providers.Web3Provider(window.ethereum);
-	}
+    if (window.ethereum) {
+        provider = new ethers.providers.Web3Provider(window.ethereum);
+        DoctorManager = new ethers.Contract(PUBLIC_DM_ADDRESS, CDDoctorManager.abi, provider);
+        PatientManager = new ethers.Contract(PUBLIC_PM_ADDRESS, CDPatientManager.abi, provider);
+    }
 
-
-	setContext('provider', provider);
+    setContext('provider', provider);
+    setContext('dm', DoctorManager);
+    setContext('pm', PatientManager);
 </script>
 
 <div>
-	<Header {provider} connected={window.ethereum.isConnected()} />
+    <Header {provider} connected={window.ethereum.isConnected()} />
 </div>
 
 <main class="flex items-center justify-center mx-a px-5">
-	<slot />
+    <slot />
 </main>
 
 <footer>
-	<p>
-		Check out <a href="https://github.com/sveltejs/kit#readme" target="_blank">SvelteKit</a>, the
-		official Svelte app framework powered by Vite!
-	</p>
+    <p>
+        Check out <a href="https://github.com/sveltejs/kit#readme" target="_blank">SvelteKit</a>,
+        the official Svelte app framework powered by Vite!
+    </p>
 
-	<p class="read-the-docs">Click on the Vite and Svelte logos to learn more</p>
+    <p class="read-the-docs">Click on the Vite and Svelte logos to learn more</p>
 </footer>
 
 <style>
-	main {
-		min-height: calc(100vh - 48px - 136px);
-		max-width: 1080px;
+    main {
+        min-height: calc(100vh - 48px - 136px);
+        max-width: 1080px;
         text-align: start;
-		/* overflow: auto; */
-	}
+        /* overflow: auto; */
+    }
 
-	footer {
-		overflow: auto;
-		height: 136px;
-	}
+    footer {
+        overflow: auto;
+        height: 136px;
+    }
 
-	.read-the-docs {
-		color: #888;
-	}
+    .read-the-docs {
+        color: #888;
+    }
 </style>
