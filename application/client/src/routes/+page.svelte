@@ -65,7 +65,7 @@
                 switch (err.response.status) {
                     case 404:
                         if (type === 'doctor') {
-                            alert('Login failed. Please try again');
+                            alert('Login failed. Please try again, or contact administrator');
                         } else {
                             goto(err.response.headers.location);
                         }

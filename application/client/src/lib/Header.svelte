@@ -41,10 +41,11 @@
     </nav>
 
     <div class="corner">
+        {#if sessionStorage.getItem('token')}
+            <button on:click={logout}>Logout</button>
+        {/if}
         {#if !connected}
             <button on:click={() => connectWallet(provider)}>Connect Wallet</button>
-        {:else if sessionStorage.getItem('token')}
-            <button on:click={logout}>Logout</button>
         {/if}
     </div>
 </header>
@@ -58,9 +59,10 @@
     }
 
     .corner {
-        width: 10em;
+        width: 15em;
         height: 3em;
         display: flex;
+        justify-content: space-between;
         align-items: center;
     }
 

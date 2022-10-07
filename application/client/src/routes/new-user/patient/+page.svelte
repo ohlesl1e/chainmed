@@ -1,15 +1,12 @@
 <script>
     import { goto } from '$app/navigation';
-    import { ContractFactory, ethers } from 'ethers';
+    import { ethers, utils } from 'ethers';
     import { getContext } from 'svelte';
-    import CDPatient from '$lib/contracts/CDPatient.json';
-    import CDManager from '$lib/contracts/CDManager.json';
     import axios from 'axios';
-
-    const MANAGER_ADDRESS = '0x1d84248Cc15b9d9443D550c181D0473c4b17E0a1';
     const BACKEND_ADDR = '/api';
 
     const provider = getContext('provider');
+    const manager = getContext('pm');
 
     const foodAllergy = [
         'Balsam of Peru',
@@ -76,14 +73,13 @@
         //     cannabis
         // );
 
-        let manager = new ethers.Contract(MANAGER_ADDRESS, CDManager.abi, provider.getSigner());
         manager
             .register(
-                ethers.utils.formatBytes32String(name),
-                ethers.utils.formatBytes32String(gender),
-                Math.floor(new Date(dob).getTime() / 1000),
+                utils.formatBytes32String(name),
+                utils.formatBytes32String(gender),
+                new Date(dob).getTime(),
                 height,
-                weight,
+                Math.ceil(weight * 100),
                 allergy,
                 alcohol,
                 smoke,
@@ -142,7 +138,7 @@
             <input type="number" bind:value={height} required />
 
             <label for="weight"><b>Weight</b>(kg)</label>
-            <input type="number" bind:value={weight} required />
+            <input type="number" step=".01" bind:value={weight} required />
 
             <label for="allergy"><b>Allergy</b>(Select all that apply)</label>
             <label for="food">Food</label>

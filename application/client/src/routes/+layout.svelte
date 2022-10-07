@@ -12,8 +12,8 @@
 
     if (window.ethereum) {
         provider = new ethers.providers.Web3Provider(window.ethereum);
-        DoctorManager = new ethers.Contract(PUBLIC_DM_ADDRESS, CDDoctorManager.abi, provider);
-        PatientManager = new ethers.Contract(PUBLIC_PM_ADDRESS, CDPatientManager.abi, provider);
+        DoctorManager = new ethers.Contract(PUBLIC_DM_ADDRESS, CDDoctorManager.abi, provider.getSigner());
+        PatientManager = new ethers.Contract(PUBLIC_PM_ADDRESS, CDPatientManager.abi, provider.getSigner());
     }
 
     setContext('provider', provider);
@@ -22,7 +22,7 @@
 </script>
 
 <div>
-    <Header {provider} connected={window.ethereum.isConnected()} />
+    <Header {provider} connected={!window.ethereum.isConnected()} />
 </div>
 
 <main class="flex items-center justify-center mx-a px-5">

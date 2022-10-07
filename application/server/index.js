@@ -18,8 +18,8 @@ const signer = provider.getSigner()
 const CDDoctorManager = require('./contracts/CDDoctorManager.json')
 const CDPatientManager = require('./contracts/CDPatientManager.json')
 
-const DoctorManagerContract = new ethers.Contract(process.env.DM_ADDRESS, CDDoctorManager.abi, provider)
-const PatientManagerContract = new ethers.Contract(process.env.PM_ADDRESS, CDPatientManager.abi, provider)
+const DoctorManagerContract = new ethers.Contract(process.env.PUBLIC_DM_ADDRESS, CDDoctorManager.abi, provider)
+const PatientManagerContract = new ethers.Contract(process.env.PUBLIC_PM_ADDRESS, CDPatientManager.abi, provider)
 
 const redisClient = createClient({
     legacyMode: true
@@ -98,7 +98,7 @@ connection.connect(err => {
                     DoctorManagerContract.getDoctor(siweMessage.address).then(result => {
                         console.log(result);
                         if (result !== ethers.constants.AddressZero) {
-                            return res.status(200).send({ message: "Login success", token: jwt.sign({ type }, privateKey, { algorithm: 'RS256' }) })
+                            return res.status(200).send({ message: "Login success", token: jwt.sign({ type, address: result }, { key: privateKey, passphrase: 'top secret' }, { algorithm: 'RS256' }) })
                         }
                         return res.status(404).send("Profile not found")
                     })
@@ -107,9 +107,9 @@ connection.connect(err => {
                     PatientManagerContract.getPatient(siweMessage.address).then(result => {
                         console.log(result);
                         if (result !== ethers.constants.AddressZero) {
-                            return res.status(200).send({ message: "Login success", token: jwt.sign({ type }, privateKey, { algorithm: 'RS256' }) })
+                            return res.status(200).send({ message: "Login success", token: jwt.sign({ type, address: result }, { key: privateKey, passphrase: 'top secret' }, { algorithm: 'RS256' }) })
                         }
-                        return res.status(404).header({ location: '/new-patient' }).send("Profile not found")
+                        return res.status(404).header({ location: '/new-user/patient' }).send("Profile not found")
                     })
                     break
                 default:

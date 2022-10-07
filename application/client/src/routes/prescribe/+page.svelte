@@ -6,12 +6,11 @@
     import { stopTyping } from '$lib/onStopTyping';
     import { onMount, getContext } from 'svelte';
     import CDPatient from '$lib/contracts/CDPatient.json';
-    import CDManager from '$lib/contracts/CDManager.json';
-    import { ethers } from 'ethers';
+    import { ethers, utils } from 'ethers';
 
     const provider = getContext('provider');
-    const MANAGER_ADDRESS = '0x1d84248Cc15b9d9443D550c181D0473c4b17E0a1';
-    const manager = new ethers.Contract(MANAGER_ADDRESS, CDManager.abi, provider);
+    const doctorManager = getContext('dm');
+    const patientManager = getContext('pm');
 
     const BACKEND_ADDR = '/api';
     let steps = ['patient', 'medicine', 'form', 'dosage', 'schedule', 'review'];
@@ -62,7 +61,7 @@
         startDate: `${yyyy}-${mm}-${dd}`,
         endDate: '',
         frequency: 0,
-        interval: '',
+        interval: 1,
         daysOfWeek: [],
         timesOfDay: [],
     };
@@ -71,35 +70,38 @@
 
     const getPatientInfo = async (e) => {
         e.preventDefault();
-        let patientAddress = await manager.getPatient(patient);
-        let patientContract = new ethers.Contract(
-            patientAddress,
-            CDPatient.abi,
-            provider.getSigner()
-        );
-        patientContract
-            .getInfo()
-            .then((res) => {
-                console.log(ethers.BigNumber.from(res[2]._hex));
-                info = {
-                    name: ethers.utils.parseBytes32String(res[0]),
-                    gender: ethers.utils.parseBytes32String(res[1]),
-                    age:
-                        new Date().getFullYear() -
-                        new Date(ethers.BigNumber.from(res[2]._hex) * 1000).getFullYear(),
-                    height: res[3],
-                    weight: res[4],
-                    allergy: res[5],
-                    alcohol: res[6],
-                    smoke: res[7],
-                    cannabis: res[8],
-                    treatment: res[9],
-                };
-            })
-            .catch((err) => {
-                console.log(err);
-                info = null;
-            });
+        let patientAddress = await patientManager.getPatient(patient);
+        if (patientAddress != ethers.constants.AddressZero) {
+            let patientContract = new ethers.Contract(
+                patientAddress,
+                CDPatient.abi,
+                provider.getSigner()
+            );
+            patientContract
+                .getInfo()
+                .then((res) => {
+                    info = {
+                        name: ethers.utils.parseBytes32String(res[0]),
+                        gender: ethers.utils.parseBytes32String(res[1]),
+                        age:
+                            new Date().getFullYear() -
+                            new Date(ethers.BigNumber.from(res[2]).toNumber()).getFullYear(),
+                        height: res[3],
+                        weight: res[4],
+                        allergy: res[5],
+                        alcohol: res[6],
+                        smoke: res[7],
+                        cannabis: res[8],
+                        treatment: res[9],
+                    };
+                })
+                .catch((err) => {
+                    console.log(err);
+                    info = null;
+                });
+        } else {
+            alert('Patient not found');
+        }
     };
 
     const handleProgress = (n) => {
@@ -158,12 +160,56 @@
         }
         cantContinue = true;
     };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        console.log({
+            patientManager,
+            patient,
+            medicine,
+            form,
+            dosage,
+            schedule,
+        });
+
+        doctorManager
+            .prescribe(
+                patientManager.address,
+                patient,
+                medicine,
+                utils.formatBytes32String(form),
+                [dosage.strength, utils.formatBytes32String(dosage.unit)],
+                [
+                    new Date(schedule.startDate).getTime(),
+                    new Date(schedule.endDate).getTime(),
+                    schedule.frequency,
+                    schedule.interval === '' ? 0 : schedule.interval,
+                    schedule.daysOfWeek.map((value) => utils.formatBytes32String(value)),
+                    schedule.timesOfDay.map((value) => parseInt(value.split(':').join(''))),
+                ]
+            )
+            .then(
+                (res) => {
+                    console.log(res);
+                    alert('Successfully prescribed');
+                    setTimeout(() => {
+                        goto('/');
+                    }, 3000);
+                },
+                (err) => {
+                    console.log(err);
+                }
+            );
+    };
 </script>
 
 <div class="flex flex-col prescribe-form">
     <h1 class="text-4xl">Prescribe medicine</h1>
     <FormProgress {steps} bind:currentTab bind:this={progressBar} />
-    <form class="flex flex-col justify-between bg-zinc-800 p-6 rd-3">
+    <form
+        on:submit={(e) => handleSubmit(e)}
+        class="flex flex-col justify-between bg-zinc-800 p-6 rd-3"
+    >
         {#if currentTab === 0}
             <!-- patient -->
             <div class="form-step">
@@ -207,7 +253,7 @@
                                 <h4 class="m-1">
                                     {#if info.allergy.length}
                                         {#each info.allergy as al}
-                                            {ethers.utils.parseBytes32String(al)},
+                                            {al},
                                         {/each}
                                     {:else}
                                         {'N/A'}

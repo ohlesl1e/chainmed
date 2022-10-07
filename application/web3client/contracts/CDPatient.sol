@@ -4,6 +4,13 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/access/AccessControl.sol";
 import "./CDTreatment.sol";
 
+struct TreatmentStruct {
+    string medicine;
+    bytes32 form;
+    Dosage dosage;
+    Schedule schedule;
+}
+
 contract CDPatient is AccessControl {
     bytes32 public constant PATIENT_ROLE = keccak256("PATIENT_ROLE");
     bytes32 public constant DOCTOR_ROLE = keccak256("DOCTOR_ROLE");
@@ -82,11 +89,25 @@ contract CDPatient is AccessControl {
             bool,
             bool,
             bool,
-            CDTreatment[] memory
+            TreatmentStruct[] memory
         )
     {
         string[] memory allergy_ = allergy;
-        CDTreatment[] memory treatments_ = treatments;
+        TreatmentStruct[] memory treatments_ = new TreatmentStruct[](
+            treatments.length
+        );
+
+        for (uint i = 0; i < treatments.length; i++) {
+            (
+                string memory medicine_,
+                bytes32 form_,
+                Dosage memory dosage_,
+                Schedule memory schedule_
+            ) = treatments[i].getTreatment();
+            treatments_[i] = (
+                TreatmentStruct(medicine_, form_, dosage_, schedule_)
+            );
+        }
 
         return (
             name,
