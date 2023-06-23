@@ -17,7 +17,7 @@ const connection = mysql.createConnection({
   database: 'mydb',
 })
 
-const paths = ['./.env', './sveltekit/.env']
+const paths = ['./.env', './chaindoser/.env', './manager/.env']
 
 const scheduleUnit = ['d', 'w', 'M']
 const genders = ['Man', 'Woman', 'Non-binary']
@@ -157,6 +157,7 @@ contract("Application", async (accounts) => {
     const manager = await Manager.deployed()
     const transactions = []
 
+
     const doc1 = application.addDoctor(accounts[accounts.length - 1], web3.utils.toHex('Dolores Haze'), web3.utils.toHex('Kaiser Permanente'), { from: accounts[accounts.length - 1] })
     const doc2 = application.addDoctor(accounts[accounts.length - 2], web3.utils.toHex('Jonah Vogelbaum'), web3.utils.toHex('Vought International'), { from: accounts[accounts.length - 2] })
 
@@ -173,7 +174,7 @@ contract("Application", async (accounts) => {
     return assert.isTrue(isValidNonZeroAddress(prof1) && isValidNonZeroAddress(prof2))
   })
 
-  it(`should add ${accounts.length - 2} patients`, async () => {
+  it(`should add ${accounts.length - 3} patients`, async () => {
     // const application = await Application.at(process.env.PUBLIC_APPLICATION_ADDRESS);
     // const manager = await Manager.at(process.env.PUBLIC_MANAGER_ADDRESS)
     const application = await Application.deployed()
@@ -189,67 +190,78 @@ contract("Application", async (accounts) => {
     const bar2 = multiBar.create(accounts.length - 2, 0)
 
     for (let i = 0; i < accounts.length - 2; i++) {
+      if (i !== 4) {
 
-      const res = (await axios.get('https://api.api-ninjas.com/v1/randomuser', {
-        headers: { 'X-Api-Key': '64+omSqijRq2AO8iwDwaoA==VN9F5JioJSciClcN' }
-      })).data
-      // console.log(res);
-      const account = accounts[i]
-      const name = web3.utils.padRight(web3.utils.asciiToHex(res.name), 64)
-      const gender = web3.utils.padRight(web3.utils.asciiToHex(genders[getRandomUint(0, 3)]), 64)
-      const dob = new Date(res.birthday)
-      const height = getRandomUint(150, 200)
-      const weight = getRandomUint(5000, 10000)
-      const allergy = []
-      const alcohol = getRandomUint(0, 2) === 1 ? true : false
-      const smoke = getRandomUint(0, 2) === 1 ? true : false
-      const cannabis = getRandomUint(0, 2) === 1 ? true : false
 
-      // console.log({
-      //   i,
-      //   account,
-      //   name,
-      //   gender,
-      //   dob,
-      //   height,
-      //   weight,
-      //   allergy,
-      //   alcohol,
-      //   smoke,
-      //   cannabis,
-      // });
-      transactions.push(application.addPatient(
-        [name,
-          gender],
-        Math.abs(Math.floor(dob.getTime() / 1000)),
-        height,
-        weight,
-        allergy,
-        [alcohol,
+        const res = (await axios.get('https://api.api-ninjas.com/v1/randomuser', {
+          headers: { 'X-Api-Key': '64+omSqijRq2AO8iwDwaoA==VN9F5JioJSciClcN' }
+        })).data
+        // console.log(res);
+        const account = accounts[i]
+        const name = web3.utils.padRight(web3.utils.asciiToHex(res.name), 64)
+        const gender = web3.utils.padRight(web3.utils.asciiToHex(genders[getRandomUint(0, 3)]), 64)
+        const dob = new Date(res.birthday)
+        const height = getRandomUint(150, 200)
+        const weight = getRandomUint(5000, 10000)
+        const allergy = []
+        const alcohol = getRandomUint(0, 2) === 1 ? true : false
+        const smoke = getRandomUint(0, 2) === 1 ? true : false
+        const cannabis = getRandomUint(0, 2) === 1 ? true : false
+
+        console.log({
+          i,
+          account,
+          name,
+          gender,
+          dob,
+          height,
+          weight,
+          allergy,
+          alcohol,
           smoke,
-          cannabis],
-        { from: account }
-      ))
-      // const patient = application.addPatient(
-      //   [name,
-      //     gender],
-      //   Math.abs(Math.floor(dob.getTime() / 1000)),
-      //   height,
-      //   weight,
-      //   allergy,
-      //   [alcohol,
-      //     smoke,
-      //     cannabis],
-      //   { from: account }
-      // )
-      // console.log(patient);
+          cannabis,
+        });
+        if (i === 3) {
+          transactions.push(manager.addPatient(
+            [name, gender],
+            Math.abs(Math.floor(dob.getTime() / 1000)),
+            [height, weight],
+            allergy,
+            [alcohol, smoke, cannabis],
+            [false, account]
+          ))
+        } else {
+          transactions.push(application.addPatient(
+            [name, gender],
+            Math.abs(Math.floor(dob.getTime() / 1000)),
+            [height, weight],
+            allergy,
+            [alcohol, smoke, cannabis],
+            { from: account }
+          ))
+        }
+
+        // const patient = application.addPatient(
+        //   [name,
+        //     gender],
+        //   Math.abs(Math.floor(dob.getTime() / 1000)),
+        //   height,
+        //   weight,
+        //   allergy,
+        //   [alcohol,
+        //     smoke,
+        //     cannabis],
+        //   { from: account }
+        // )
+        // console.log(patient);
 
 
-      // const prof = await manager.getPatient(account)
-      // console.log({ account, patient, prof });
+        // const prof = await manager.getPatient(account)
+        // console.log({ account, patient, prof });
 
-      // addresses.push(isValidNonZeroAddress(prof))
-      bar1.increment()
+        // addresses.push(isValidNonZeroAddress(prof))
+        bar1.increment()
+      }
     };
 
     bar1.stop()
@@ -294,7 +306,7 @@ contract("Application", async (accounts) => {
       const doctor = accounts[accounts.length - i]
       for (let j = 0; j < accounts.length - 2; j++) {
         bar1.increment()
-        if ((i === 1 && j % 17 !== 5) || j % 18 !== 1) {
+        if (j !== 4 && ((i === 1 && j % 17 !== 5) || j % 18 !== 1)) {
           const patient = accounts[j]
 
           await Promise.all([
@@ -334,7 +346,7 @@ contract("Application", async (accounts) => {
     for (let i = 0; i < accounts.length - 2; i++) {
       // console.log({ profile });
       for (let j = 0; j < 2; j++) {
-        if (i === 2 && j === 1) {
+        if ((i === 2 && j === 1) || i === 4) {
           continue
         }
         const patient = accounts[i]
@@ -388,33 +400,37 @@ contract("Application", async (accounts) => {
     let writeAccessResult = []
 
     for (let i = 0; i < 2; i++) {
+      if (i !== 4) {
       const doctor = accounts[accounts.length - i - 1]
       const patient = await manager.getPatient(accounts[2])
       const profile = await Patient.at(patient)
 
       // console.log({ patient, doctor });
+      
 
-      try {
-        // profile.getInfo({ from: doctor })
-        //   .then(res => {
 
-        //     readAccessResult.push(true)
-        //   }).catch(err => {
-        //     readAccessResult.push(false)
-        //   })
-        let result = await profile.getInfo({ from: doctor })
-        // console.log(result);
-        readAccessResult.push(true)
-      } catch (error) {
-        // console.log(error);
-        readAccessResult.push(false)
-      }
-      try {
-        const result = await profile.checkDoctor(doctor, { from: doctor })
-        // console.log({ result });
-        writeAccessResult.push(result)
-      } catch (error) {
-        writeAccessResult.push(false)
+        try {
+          // profile.getInfo({ from: doctor })
+          //   .then(res => {
+
+          //     readAccessResult.push(true)
+          //   }).catch(err => {
+          //     readAccessResult.push(false)
+          //   })
+          let result = await profile.getInfo({ from: doctor })
+          // console.log(result);
+          readAccessResult.push(true)
+        } catch (error) {
+          // console.log(error);
+          readAccessResult.push(false)
+        }
+        try {
+          const result = await profile.checkDoctor(doctor, { from: doctor })
+          // console.log({ result });
+          writeAccessResult.push(result)
+        } catch (error) {
+          writeAccessResult.push(false)
+        }
       }
     }
 

@@ -29,7 +29,13 @@ contract DoctorFactory is Ownable {
                 affiliate_
             );
         } else {
-            Doctor(clone).initialize(doctor_, address(0),msg.sender, name_, affiliate_);
+            Doctor(clone).initialize(
+                doctor_,
+                address(0),
+                msg.sender,
+                name_,
+                affiliate_
+            );
         }
     }
 }

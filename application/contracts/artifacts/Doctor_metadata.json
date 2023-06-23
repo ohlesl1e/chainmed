@@ -179,31 +179,9 @@
 				"name": "getTreatments",
 				"outputs": [
 					{
-						"components": [
-							{
-								"internalType": "address",
-								"name": "id",
-								"type": "address"
-							},
-							{
-								"internalType": "address",
-								"name": "patient",
-								"type": "address"
-							},
-							{
-								"internalType": "string",
-								"name": "medicine",
-								"type": "string"
-							},
-							{
-								"internalType": "bool",
-								"name": "completed",
-								"type": "bool"
-							}
-						],
-						"internalType": "struct DoctorTreatmentMeta[]",
-						"name": "treatments_",
-						"type": "tuple[]"
+						"internalType": "address[]",
+						"name": "",
+						"type": "address[]"
 					}
 				],
 				"stateMutability": "view",
@@ -252,41 +230,6 @@
 				"type": "function"
 			},
 			{
-				"inputs": [],
-				"name": "hasWriteAccess",
-				"outputs": [],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "owner_",
-						"type": "address"
-					},
-					{
-						"internalType": "address",
-						"name": "manager_",
-						"type": "address"
-					},
-					{
-						"internalType": "bytes32",
-						"name": "name_",
-						"type": "bytes32"
-					},
-					{
-						"internalType": "bytes32",
-						"name": "affiliate_",
-						"type": "bytes32"
-					}
-				],
-				"name": "initialize",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
 				"inputs": [
 					{
 						"internalType": "address",
@@ -314,7 +257,7 @@
 						"type": "bytes32"
 					}
 				],
-				"name": "initializeFromApp",
+				"name": "initialize",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -486,19 +429,19 @@
 			]
 		},
 		"contracts/Doctor.sol": {
-			"keccak256": "0x54c08a42ede843c35f32186688bc2d8e3943e64da100e713a84da34d9bb59608",
+			"keccak256": "0xb1cdfbfa349b9f4ace4790ea9f178c1d9439a472a2e06acead03ec670fdb1f99",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://35e9188962660912ffad4283f928492b366b55d666641cd1f5c24680f2dd45cb",
-				"dweb:/ipfs/QmQjaexudbshsA6XFUeHnx5V6k2JVDmfbcLkgmoERoGJ8a"
+				"bzz-raw://59b3d941f3ca13e923f48c6cb8625dd05e8b69650544d685772fba66a941b7cd",
+				"dweb:/ipfs/QmWzq1qbJ1sCPDTUu7beHgmZNLKpyksiorui5kYwdW9oBs"
 			]
 		},
 		"contracts/Treatment.sol": {
-			"keccak256": "0x4eff2ee4e527ed2f59f89400ec3760f7f2ae13ea3e791df10b0a04256aac7708",
+			"keccak256": "0x141886ce035365583c2f98db2581573f516974c9b0d794c0c2a4630e15b6a125",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://f07dd2b7319095efb64fa22fe32bee4231ee21c0c8110b6c9d1cc776a741e8d1",
-				"dweb:/ipfs/QmSfw171vUCmaRmEo8BfLVboBgiyXQk4nS8gMYzPDsdXXK"
+				"bzz-raw://7b66acb14c9b283a2fe9d5cb077ded8d3fab66f119e23f20c2d045a9fa9469b2",
+				"dweb:/ipfs/QmZER6WugK5BsenwnPAvBua2dbDuZnzw5MjVdEGzXxbmSp"
 			]
 		},
 		"contracts/TreatmentFactory.sol": {

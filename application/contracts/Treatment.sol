@@ -76,9 +76,9 @@ contract Treatment is AccessControl {
     function getMedicine()
         external
         view
-        returns (string memory medicine_)
+        returns (string memory medicine_, bool isComplete_)
     {
-        return medicine;
+        return (medicine, isComplete());
     }
 
     function getTreatment()

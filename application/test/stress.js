@@ -125,7 +125,7 @@ contract("Application", async (accounts) => {
         const application = await Application.at(process.env.PUBLIC_APPLICATION_ADDRESS)
         const transactions = []
         const trxReceipt = []
-        const load = 1000
+        const load = 16
         const con = connection.promise()
         const [results] = await con.execute('SELECT * FROM medicine WHERE ACTIVE_INGRED_UNIT="mg/mL" LIMIT 1000')
         // console.log(results[0]);
@@ -155,8 +155,8 @@ contract("Application", async (accounts) => {
             const start = moment()
             const end = start.clone().add(getRandomUint(1, 24), scheduleUnit[getRandomUint(0, 3)])
             const frequency = getRandomUint(0, 3)
-            const interval = frequency === 0 ? getRandomUint(1, 99) : 0
-            const dow = frequency === 1 ? ['MON', 'WED', 'FRI'] : []
+            const interval = frequency === 0 ? getRandomUint(1, 2) : 0
+            const dow = frequency === 1 ? i % 3 === 0 ? ['MON', 'WED', 'FRI'] : ['TUE', 'THU', 'SAT'] : []
             const tod = frequency !== 2 ?
                 [parseInt(`${getRandomUint(0, 12)}${getRandomUint(0, 60)}`)] : []
             try {

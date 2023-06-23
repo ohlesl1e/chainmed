@@ -23,6 +23,7 @@
     "log-with-statusbar": "^1.2.0",
     "moment": "^2.29.4",
     "mysql2": "^2.3.3",
+    "svelte-qrcode": "^1.0.0",
     "truffle-contract-size": "^2.0.1"
   }
 }

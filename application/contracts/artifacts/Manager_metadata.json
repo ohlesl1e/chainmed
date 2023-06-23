@@ -6,6 +6,125 @@
 	"output": {
 		"abi": [
 			{
+				"inputs": [],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					},
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "previousAdminRole",
+						"type": "bytes32"
+					},
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "newAdminRole",
+						"type": "bytes32"
+					}
+				],
+				"name": "RoleAdminChanged",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "sender",
+						"type": "address"
+					}
+				],
+				"name": "RoleGranted",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "sender",
+						"type": "address"
+					}
+				],
+				"name": "RoleRevoked",
+				"type": "event"
+			},
+			{
+				"inputs": [],
+				"name": "ADMINISTRATOR_ROLE",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "APPLICATION_ROLE",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "DEFAULT_ADMIN_ROLE",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
 				"inputs": [
 					{
 						"internalType": "address",
@@ -58,14 +177,21 @@
 						"type": "uint256"
 					},
 					{
-						"internalType": "uint16",
-						"name": "height_",
-						"type": "uint16"
-					},
-					{
-						"internalType": "uint16",
-						"name": "weight_",
-						"type": "uint16"
+						"components": [
+							{
+								"internalType": "uint16",
+								"name": "value1",
+								"type": "uint16"
+							},
+							{
+								"internalType": "uint16",
+								"name": "value2",
+								"type": "uint16"
+							}
+						],
+						"internalType": "struct SmallUintPair",
+						"name": "physique_",
+						"type": "tuple"
 					},
 					{
 						"internalType": "string[]",
@@ -91,7 +217,7 @@
 							}
 						],
 						"internalType": "struct BoolTriple",
-						"name": "alcoholSmokeCannabis_",
+						"name": "habits_",
 						"type": "tuple"
 					},
 					{
@@ -211,11 +337,146 @@
 				],
 				"stateMutability": "view",
 				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					}
+				],
+				"name": "getRoleAdmin",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					}
+				],
+				"name": "grantRole",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					}
+				],
+				"name": "hasRole",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					}
+				],
+				"name": "renounceRole",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					}
+				],
+				"name": "revokeRole",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes4",
+						"name": "interfaceId",
+						"type": "bytes4"
+					}
+				],
+				"name": "supportsInterface",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
 			}
 		],
 		"devdoc": {
 			"kind": "dev",
-			"methods": {},
+			"methods": {
+				"getRoleAdmin(bytes32)": {
+					"details": "Returns the admin role that controls `role`. See {grantRole} and {revokeRole}. To change a role's admin, use {_setRoleAdmin}."
+				},
+				"grantRole(bytes32,address)": {
+					"details": "Grants `role` to `account`. If `account` had not been already granted `role`, emits a {RoleGranted} event. Requirements: - the caller must have ``role``'s admin role. May emit a {RoleGranted} event."
+				},
+				"hasRole(bytes32,address)": {
+					"details": "Returns `true` if `account` has been granted `role`."
+				},
+				"renounceRole(bytes32,address)": {
+					"details": "Revokes `role` from the calling account. Roles are often managed via {grantRole} and {revokeRole}: this function's purpose is to provide a mechanism for accounts to lose their privileges if they are compromised (such as when a trusted device is misplaced). If the calling account had been revoked `role`, emits a {RoleRevoked} event. Requirements: - the caller must be `account`. May emit a {RoleRevoked} event."
+				},
+				"revokeRole(bytes32,address)": {
+					"details": "Revokes `role` from `account`. If `account` had been granted `role`, emits a {RoleRevoked} event. Requirements: - the caller must have ``role``'s admin role. May emit a {RoleRevoked} event."
+				},
+				"supportsInterface(bytes4)": {
+					"details": "See {IERC165-supportsInterface}."
+				}
+			},
 			"version": 1
 		},
 		"userdoc": {
@@ -248,12 +509,28 @@
 				"dweb:/ipfs/QmTSJvhjHfnUV1j4hsqDv8PmLvGBLRs9gHLjTUXrUJ5Y9q"
 			]
 		},
+		"@openzeppelin/contracts/access/AccessControlEnumerable.sol": {
+			"keccak256": "0x13f5e15f2a0650c0b6aaee2ef19e89eaf4870d6e79662d572a393334c1397247",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://7ee05f28f549a5d6515e152580716b87636ed4bfab9812499a6e3803df88288b",
+				"dweb:/ipfs/QmeEnhdwY1t5Y3YU5a4ffzgXuToydH2PNdNxV9W7dEPRQJ"
+			]
+		},
 		"@openzeppelin/contracts/access/IAccessControl.sol": {
 			"keccak256": "0x59ce320a585d7e1f163cd70390a0ef2ff9cec832e2aa544293a00692465a7a57",
 			"license": "MIT",
 			"urls": [
 				"bzz-raw://bb2c137c343ef0c4c7ce7b18c1d108afdc9d315a04e48307288d2d05adcbde3a",
 				"dweb:/ipfs/QmUxhrAQM3MM3FF5j7AtcXLXguWCJBHJ14BRdVtuoQc8Fh"
+			]
+		},
+		"@openzeppelin/contracts/access/IAccessControlEnumerable.sol": {
+			"keccak256": "0xba4459ab871dfa300f5212c6c30178b63898c03533a1ede28436f11546626676",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://3dcc7b09bfa6e18aab262ca372f4a9b1fc82e294b430706a4e1378cf58e6a276",
+				"dweb:/ipfs/QmT8oSAcesdctR15HMLhr2a1HRpXymxdjTfdtfTYJcj2N2"
 			]
 		},
 		"@openzeppelin/contracts/access/Ownable.sol": {
@@ -304,60 +581,68 @@
 				"dweb:/ipfs/QmP7C3CHdY9urF4dEMb9wmsp1wMxHF6nhA2yQE5SKiPAdy"
 			]
 		},
-		"contracts/Doctor.sol": {
-			"keccak256": "0x54c08a42ede843c35f32186688bc2d8e3943e64da100e713a84da34d9bb59608",
+		"@openzeppelin/contracts/utils/structs/EnumerableSet.sol": {
+			"keccak256": "0x5050943b32b6a8f282573d166b2e9d87ab7eb4dbba4ab6acf36ecb54fe6995e4",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://35e9188962660912ffad4283f928492b366b55d666641cd1f5c24680f2dd45cb",
-				"dweb:/ipfs/QmQjaexudbshsA6XFUeHnx5V6k2JVDmfbcLkgmoERoGJ8a"
+				"bzz-raw://d4831d777a29ebdf9f2caecd70e74b97bff1b70e53622fd0a02aed01e21c8271",
+				"dweb:/ipfs/QmUqurVVnCc7XkMxb2k23TVQUtuhHZduJ3hTZarTJrqU24"
+			]
+		},
+		"contracts/Doctor.sol": {
+			"keccak256": "0xb1cdfbfa349b9f4ace4790ea9f178c1d9439a472a2e06acead03ec670fdb1f99",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://59b3d941f3ca13e923f48c6cb8625dd05e8b69650544d685772fba66a941b7cd",
+				"dweb:/ipfs/QmWzq1qbJ1sCPDTUu7beHgmZNLKpyksiorui5kYwdW9oBs"
 			]
 		},
 		"contracts/DoctorFactory.sol": {
-			"keccak256": "0x756881eb09c3e2d98e8d612857290db43c06d03870b7e5d0a95aae9dbd95749f",
+			"keccak256": "0xd72b17137bf3518f793626cf75c7b36717e234902e8b8532aa5e28e15e776c8f",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://f44950ca912f70171cd626858a65a8a85ffbf642920f9480670b52ead6889208",
-				"dweb:/ipfs/QmfAyCYwZsboypxWKbiTtFPBXLYaors7qehvcAyXd1nMEo"
+				"bzz-raw://15802176e887309106b348373fcc1aa241079951979846882fdd9bf3ba75fd5a",
+				"dweb:/ipfs/QmPupCYx43TguXbjan2DpGyJyotVQ5rdjPeexYXKWTwHX2"
 			]
 		},
 		"contracts/Helper.sol": {
-			"keccak256": "0x4544d2a65b4a8e43484353efc6ba9e1dcdfe18ffb424517cf55cda15064621c2",
+			"keccak256": "0x6479a2d2ae286386b88602e570bef7e4fdd137e2af83721795d7db7a8b01a6f9",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://0853c1cd33caac85489c48ff5d76eb70f52b2e46846fb04e24c2cba8fcd42ade",
-				"dweb:/ipfs/QmSdZsMUxXNxZaMNTpVREoLeoMqu7ChdzuZNg1xcsnBbGS"
+				"bzz-raw://3d2d32e638a4f24b7eab31ec24a4923f54e89785678b75b05cd9d27d501c82ca",
+				"dweb:/ipfs/QmbV4qANJ21Rw5J2iW3L7bmAKuFLNDzmvLFz7UN57UqDxg"
 			]
 		},
 		"contracts/Manager.sol": {
-			"keccak256": "0xaa552b91cc966133ec6442f2bb20346438b7f105db9e013a795ad2ad3a85b438",
+			"keccak256": "0x57db1553d068332b369fe425db28db5ccccc33121e5efbcd5f5c72dd939bab8a",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://cbc72eb0fdd8d5169e3884a58783aa49ad5837f3a90f558415adcc293c608cc9",
-				"dweb:/ipfs/QmVGg6DhcWxtiG9VeVVgxeF1upGthppZUtTWpzURPPZPMb"
+				"bzz-raw://1a388af489abd2c9eb44d43df20dc0654ff833dd15707f70abda71ee986a222f",
+				"dweb:/ipfs/QmTzzshDVvPNijhdVChmBRN5qJePuEM7fw2X2SB2wNUvgU"
 			]
 		},
 		"contracts/Patient.sol": {
-			"keccak256": "0xf59a05176962164e2b1179f7c2cf6afb4d9a8d70632ea60e38619a9dfda46109",
+			"keccak256": "0x0268faf25bcb8e1c2becfa08d34ae77a18e27cce567223df7050e2f79b7104ee",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://ddf8b714f6d0dae5a0a64c43c8ea0c47a3be79caa260f3b8e5d99df049a10d20",
-				"dweb:/ipfs/QmdPiuB57xdAZtmpHUmC3WKnqvwtocoMXkq4aZNBdS2d4k"
+				"bzz-raw://0927beab6019b17e76f17d47a8790a4b9349b3c3ce62ca870bd02621826b07a1",
+				"dweb:/ipfs/QmeyXF4sMSkGHcJg8a4qsPA8CdjRSTzxLrQo9viyYsuXxD"
 			]
 		},
 		"contracts/PatientFactory.sol": {
-			"keccak256": "0x381eaaee6a68ad550bc2fc7947f3b910a6db851a4b904feab53b0c223a2d5a71",
+			"keccak256": "0x248049c4ab86f18c03e4f75f1f424cc3e6d0ab49247ae2fbea22e389bce71cec",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://e2124a686d0dfa721504ef652195234a9c66fa3ffba9f462fe3179bdf2b435c3",
-				"dweb:/ipfs/Qmf5tyGJZSMERBwE1KWCfRCGKsWKyZ1i26dCbnNv1mNrtK"
+				"bzz-raw://227daa4fdb3bbfa342dc1c7b7b788666ec896102b3722268637ab2b06ad803bb",
+				"dweb:/ipfs/QmPJ3UHzindBH23ARbU5pLJxrmAsYFknZGAXquCj22QiRG"
 			]
 		},
 		"contracts/Treatment.sol": {
-			"keccak256": "0x4eff2ee4e527ed2f59f89400ec3760f7f2ae13ea3e791df10b0a04256aac7708",
+			"keccak256": "0x141886ce035365583c2f98db2581573f516974c9b0d794c0c2a4630e15b6a125",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://f07dd2b7319095efb64fa22fe32bee4231ee21c0c8110b6c9d1cc776a741e8d1",
-				"dweb:/ipfs/QmSfw171vUCmaRmEo8BfLVboBgiyXQk4nS8gMYzPDsdXXK"
+				"bzz-raw://7b66acb14c9b283a2fe9d5cb077ded8d3fab66f119e23f20c2d045a9fa9469b2",
+				"dweb:/ipfs/QmZER6WugK5BsenwnPAvBua2dbDuZnzw5MjVdEGzXxbmSp"
 			]
 		},
 		"contracts/TreatmentFactory.sol": {

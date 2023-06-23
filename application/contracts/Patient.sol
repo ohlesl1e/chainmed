@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/access/AccessControl.sol";
+import "@openzeppelin/contracts/access/AccessControlEnumerable.sol";
 import "./Treatment.sol";
 import "./Helper.sol";
 
-contract Patient is AccessControl {
+contract Patient is AccessControlEnumerable {
     bytes32 public constant PATIENT_ROLE = keccak256("PATIENT_ROLE");
     bytes32 public constant MANAGER_ROLE = keccak256("MANAGER_ROLE");
     bytes32 public constant APPLICATION_ROLE = keccak256("APPLICATION_ROLE");
@@ -110,32 +110,28 @@ contract Patient is AccessControl {
         view
         canRead
         returns (
-            bytes32,
-            bytes32,
+            Bytes32Pair memory,
             uint256,
-            uint16,
-            uint16,
+            SmallUintPair memory,
             string[] memory,
-            bool,
-            bool,
-            bool,
+            BoolTriple memory,
             address[] memory,
             address[] memory
         )
     {
         string[] memory allergy_ = allergy;
+        address[] memory treatments_ = new address[](treatments.length);
+        for (uint256 index = 0; index < treatments_.length; index++) {
+            treatments_[index] = treatments[index];
+        }
 
         return (
-            name,
-            gender,
+            Bytes32Pair(name, gender),
             dob,
-            height,
-            weight,
+            SmallUintPair(height, weight),
             allergy_,
-            alcohol,
-            smoke,
-            cannabis,
-            treatments,
+            BoolTriple(alcohol, smoke, cannabis),
+            treatments_,
             requests
         );
     }
@@ -157,17 +153,25 @@ contract Patient is AccessControl {
         weight = physique_.value2;
     }
 
+    function setAllergy(string[] memory allergy_) external canWrite {
+        allergy = allergy_;
+    }
+
     function setHabits(BoolTriple memory habits_) external canWrite {
         alcohol = habits_.value1;
         smoke = habits_.value2;
         cannabis = habits_.value3;
     }
 
-    function addTreatment(address treatment_) external canWrite {
+    function addTreatment(
+        address treatment_
+    ) external onlyRole(APPLICATION_ROLE) {
         treatments.push(treatment_);
     }
 
-    function removeTreatment(address oldTreatment) external canWrite {
+    function removeTreatment(
+        address oldTreatment
+    ) external onlyRole(APPLICATION_ROLE) {
         uint256 index = findTreatment(oldTreatment);
 
         if (index != treatments.length) {
@@ -176,11 +180,9 @@ contract Patient is AccessControl {
         }
     }
 
-    function findTreatment(address treatment)
-        private
-        view
-        returns (uint256 index)
-    {
+    function findTreatment(
+        address treatment
+    ) private view returns (uint256 index) {
         uint256 length = treatments.length;
         for (uint256 i = 0; i < length; ) {
             if (treatments[i] == treatment) {

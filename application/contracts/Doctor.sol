@@ -46,6 +46,7 @@ contract Doctor is AccessControl {
         require(init == false, "Already initialized");
         _setupRole(DOCTOR_ROLE, owner_);
         _setupRole(MANAGER_ROLE, manager_);
+        _setRoleAdmin(MANAGER_ROLE, DOCTOR_ROLE);
         if (app_ != address(0)) _setupRole(MANAGER_ROLE, app_);
 
         name = name_;
@@ -62,7 +63,7 @@ contract Doctor is AccessControl {
         affiliate_ = affiliate;
     }
 
-    function addTreatment(address treatment_) external canWrite {
+    function addTreatment(address treatment_) external onlyRole(MANAGER_ROLE) {
         treatments.push(treatment_);
     }
 

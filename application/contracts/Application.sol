@@ -8,12 +8,17 @@ import "./TreatmentFactory.sol";
 import "./Manager.sol";
 import "./Helper.sol";
 
-contract Application {
-    Manager private manager;
-    TreatmentFactory private treatmentFactory = new TreatmentFactory();
+abstract contract Application {
+    bytes32 private name;
+    Manager internal manager;
 
-    constructor(address manager_) {
+    constructor(address manager_, bytes32 name_) {
         manager = Manager(manager_);
+        name = name_;
+    }
+
+    function getName() public view returns (bytes32 name_) {
+        name_ = name;
     }
 
     function addDoctor(
@@ -21,6 +26,10 @@ contract Application {
         bytes32 name_,
         bytes32 affiliate_
     ) external {
+        require(
+            manager.hasRole(manager.ADMINISTRATOR_ROLE(), msg.sender),
+            "Administrator only"
+        );
         require(manager.getDoctor(msg.sender) == address(0), "Profile existed");
         manager.addDoctor(owner_, name_, affiliate_, true);
     }
@@ -44,32 +53,5 @@ contract Application {
             habits_,
             FromAppOption(true, msg.sender)
         );
-    }
-
-    function prescribe(
-        address patient_,
-        string memory medicine_,
-        bytes32 form_,
-        Dosage memory dosage_,
-        Schedule memory schedule_
-    ) external {
-        Patient patient = Patient(manager.getPatient(patient_));
-        Doctor doctor = Doctor(manager.getDoctor(msg.sender));
-        require(
-            address(patient) != address(0) && address(doctor) != address(0),
-            "Patient or doctor in not a user"
-        );
-        require(patient.checkDoctor(msg.sender), "User does not have access");
-
-        address newTreatment = treatmentFactory.createTreatment(
-            msg.sender,
-            patient_,
-            medicine_,
-            form_,
-            dosage_,
-            schedule_
-        );
-        doctor.addTreatment(newTreatment);
-        patient.addTreatment(newTreatment);
     }
 }

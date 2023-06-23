@@ -25,7 +25,7 @@ const { INFURA_API_KEY, ALCHEMY_API_KEY, MNEMONIC } = process.env;
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
 
 module.exports = {
-  contracts_build_directory: "./sveltekit/src/lib/contracts", // JSON file that maps to the contract
+  contracts_build_directory: "./build/contracts", // JSON file that maps to the contract
   /**
    * Networks define how you connect to your ethereum client and let you set the
    * defaults web3 uses to send transactions. If you don't specify one truffle
@@ -75,10 +75,29 @@ module.exports = {
       disableConfirmationListener: true,
       pollingInterval: 18000000
     },
-    localMain: {
-      host: "127.0.0.1",     // Localhost (default: none)
-      port: 7545,
-      network_id: '1'
+    cloud: {
+      host: "10.0.0.202",     // Localhost (default: none)
+      port: 8545,            // Standard Ethereum port (default: none)
+      network_id: "*",       // Any network (default: none),
+      gasPrice: 20000000000,
+      networkCheckTimeout: 99999999,
+      // confirmations: 10,
+      timeoutBlocks: 500,
+      skipDryRun: true,
+      disableConfirmationListener: true,
+      pollingInterval: 1800000
+    },
+    gcloud: {
+      host: "10.0.0.73",     // Localhost (default: none)
+      port: 8545,            // Standard Ethereum port (default: none)
+      network_id: "*",       // Any network (default: none),
+      gasPrice: 20000000000,
+      networkCheckTimeout: 99999999,
+      // confirmations: 10,
+      // timeoutBlocks: 1000,
+      skipDryRun: true,
+      disableConfirmationListener: true,
+      pollingInterval: 1800000
     },
     // Another network with more advanced options...
     advanced: {
