@@ -7,3 +7,8 @@ node_modules
 .env.*
 !.env.example
 .vscode
+application/server/jwtRS256.key
+application/server/contracts
+.deps
+application/server/jwtRS256.key.pub
+application/client/src/lib/jwtRS256.key.pub

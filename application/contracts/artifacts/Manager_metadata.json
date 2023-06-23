@@ -1,0 +1,658 @@
+{
+	"compiler": {
+		"version": "0.8.6+commit.11564f7e"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					},
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "previousAdminRole",
+						"type": "bytes32"
+					},
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "newAdminRole",
+						"type": "bytes32"
+					}
+				],
+				"name": "RoleAdminChanged",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "sender",
+						"type": "address"
+					}
+				],
+				"name": "RoleGranted",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "sender",
+						"type": "address"
+					}
+				],
+				"name": "RoleRevoked",
+				"type": "event"
+			},
+			{
+				"inputs": [],
+				"name": "ADMINISTRATOR_ROLE",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "APPLICATION_ROLE",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "DEFAULT_ADMIN_ROLE",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "owner_",
+						"type": "address"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "name_",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bytes32",
+						"name": "affiliate_",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "bool",
+						"name": "fromApp_",
+						"type": "bool"
+					}
+				],
+				"name": "addDoctor",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"components": [
+							{
+								"internalType": "bytes32",
+								"name": "value1",
+								"type": "bytes32"
+							},
+							{
+								"internalType": "bytes32",
+								"name": "value2",
+								"type": "bytes32"
+							}
+						],
+						"internalType": "struct Bytes32Pair",
+						"name": "nameGender_",
+						"type": "tuple"
+					},
+					{
+						"internalType": "uint256",
+						"name": "dob_",
+						"type": "uint256"
+					},
+					{
+						"components": [
+							{
+								"internalType": "uint16",
+								"name": "value1",
+								"type": "uint16"
+							},
+							{
+								"internalType": "uint16",
+								"name": "value2",
+								"type": "uint16"
+							}
+						],
+						"internalType": "struct SmallUintPair",
+						"name": "physique_",
+						"type": "tuple"
+					},
+					{
+						"internalType": "string[]",
+						"name": "allergy_",
+						"type": "string[]"
+					},
+					{
+						"components": [
+							{
+								"internalType": "bool",
+								"name": "value1",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "value2",
+								"type": "bool"
+							},
+							{
+								"internalType": "bool",
+								"name": "value3",
+								"type": "bool"
+							}
+						],
+						"internalType": "struct BoolTriple",
+						"name": "habits_",
+						"type": "tuple"
+					},
+					{
+						"components": [
+							{
+								"internalType": "bool",
+								"name": "fromApp",
+								"type": "bool"
+							},
+							{
+								"internalType": "address",
+								"name": "addr",
+								"type": "address"
+							}
+						],
+						"internalType": "struct FromAppOption",
+						"name": "option_",
+						"type": "tuple"
+					}
+				],
+				"name": "addPatient",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "patient_",
+						"type": "address"
+					}
+				],
+				"name": "applicationRequest",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "patient_",
+						"type": "address"
+					}
+				],
+				"name": "doctorRequest",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "owner_",
+						"type": "address"
+					}
+				],
+				"name": "getDoctor",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "doctor",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address[]",
+						"name": "doctors_",
+						"type": "address[]"
+					}
+				],
+				"name": "getDoctorInfo",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "bytes32",
+								"name": "name",
+								"type": "bytes32"
+							},
+							{
+								"internalType": "bytes32",
+								"name": "affiliate",
+								"type": "bytes32"
+							}
+						],
+						"internalType": "struct DoctorStruct[]",
+						"name": "docInfo",
+						"type": "tuple[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "owner_",
+						"type": "address"
+					}
+				],
+				"name": "getPatient",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "patient",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					}
+				],
+				"name": "getRoleAdmin",
+				"outputs": [
+					{
+						"internalType": "bytes32",
+						"name": "",
+						"type": "bytes32"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					}
+				],
+				"name": "grantRole",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					}
+				],
+				"name": "hasRole",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					}
+				],
+				"name": "renounceRole",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes32",
+						"name": "role",
+						"type": "bytes32"
+					},
+					{
+						"internalType": "address",
+						"name": "account",
+						"type": "address"
+					}
+				],
+				"name": "revokeRole",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "bytes4",
+						"name": "interfaceId",
+						"type": "bytes4"
+					}
+				],
+				"name": "supportsInterface",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {
+				"getRoleAdmin(bytes32)": {
+					"details": "Returns the admin role that controls `role`. See {grantRole} and {revokeRole}. To change a role's admin, use {_setRoleAdmin}."
+				},
+				"grantRole(bytes32,address)": {
+					"details": "Grants `role` to `account`. If `account` had not been already granted `role`, emits a {RoleGranted} event. Requirements: - the caller must have ``role``'s admin role. May emit a {RoleGranted} event."
+				},
+				"hasRole(bytes32,address)": {
+					"details": "Returns `true` if `account` has been granted `role`."
+				},
+				"renounceRole(bytes32,address)": {
+					"details": "Revokes `role` from the calling account. Roles are often managed via {grantRole} and {revokeRole}: this function's purpose is to provide a mechanism for accounts to lose their privileges if they are compromised (such as when a trusted device is misplaced). If the calling account had been revoked `role`, emits a {RoleRevoked} event. Requirements: - the caller must be `account`. May emit a {RoleRevoked} event."
+				},
+				"revokeRole(bytes32,address)": {
+					"details": "Revokes `role` from `account`. If `account` had been granted `role`, emits a {RoleRevoked} event. Requirements: - the caller must have ``role``'s admin role. May emit a {RoleRevoked} event."
+				},
+				"supportsInterface(bytes4)": {
+					"details": "See {IERC165-supportsInterface}."
+				}
+			},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/Manager.sol": "Manager"
+		},
+		"evmVersion": "berlin",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"@openzeppelin/contracts/access/AccessControl.sol": {
+			"keccak256": "0x5b35d8e68aeaccc685239bd9dd79b9ba01a0357930f8a3307ab85511733d9724",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://ba8eb2d22f9321bd4660f6617c181d9611ff30a9b089408b8c6e2216d6d5cdc5",
+				"dweb:/ipfs/QmTSJvhjHfnUV1j4hsqDv8PmLvGBLRs9gHLjTUXrUJ5Y9q"
+			]
+		},
+		"@openzeppelin/contracts/access/AccessControlEnumerable.sol": {
+			"keccak256": "0x13f5e15f2a0650c0b6aaee2ef19e89eaf4870d6e79662d572a393334c1397247",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://7ee05f28f549a5d6515e152580716b87636ed4bfab9812499a6e3803df88288b",
+				"dweb:/ipfs/QmeEnhdwY1t5Y3YU5a4ffzgXuToydH2PNdNxV9W7dEPRQJ"
+			]
+		},
+		"@openzeppelin/contracts/access/IAccessControl.sol": {
+			"keccak256": "0x59ce320a585d7e1f163cd70390a0ef2ff9cec832e2aa544293a00692465a7a57",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://bb2c137c343ef0c4c7ce7b18c1d108afdc9d315a04e48307288d2d05adcbde3a",
+				"dweb:/ipfs/QmUxhrAQM3MM3FF5j7AtcXLXguWCJBHJ14BRdVtuoQc8Fh"
+			]
+		},
+		"@openzeppelin/contracts/access/IAccessControlEnumerable.sol": {
+			"keccak256": "0xba4459ab871dfa300f5212c6c30178b63898c03533a1ede28436f11546626676",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://3dcc7b09bfa6e18aab262ca372f4a9b1fc82e294b430706a4e1378cf58e6a276",
+				"dweb:/ipfs/QmT8oSAcesdctR15HMLhr2a1HRpXymxdjTfdtfTYJcj2N2"
+			]
+		},
+		"@openzeppelin/contracts/access/Ownable.sol": {
+			"keccak256": "0xa94b34880e3c1b0b931662cb1c09e5dfa6662f31cba80e07c5ee71cd135c9673",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://40fb1b5102468f783961d0af743f91b9980cf66b50d1d12009f6bb1869cea4d2",
+				"dweb:/ipfs/QmYqEbJML4jB1GHbzD4cUZDtJg5wVwNm3vDJq1GbyDus8y"
+			]
+		},
+		"@openzeppelin/contracts/proxy/Clones.sol": {
+			"keccak256": "0xae614c6b103b743c62e9544632f7ef4fc8950de4e9c783d2e765a3b86701dda3",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://1840012075b9b05caa02da1b16d2d2662b2c383feb3169c8159fd8deb4840f5c",
+				"dweb:/ipfs/QmPj63a7JH3aAqVj1wvkuGEdth7s9f33vK26A5aE9k23S4"
+			]
+		},
+		"@openzeppelin/contracts/utils/Context.sol": {
+			"keccak256": "0xe2e337e6dde9ef6b680e07338c493ebea1b5fd09b43424112868e9cc1706bca7",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://6df0ddf21ce9f58271bdfaa85cde98b200ef242a05a3f85c2bc10a8294800a92",
+				"dweb:/ipfs/QmRK2Y5Yc6BK7tGKkgsgn3aJEQGi5aakeSPZvS65PV8Xp3"
+			]
+		},
+		"@openzeppelin/contracts/utils/Strings.sol": {
+			"keccak256": "0xaf159a8b1923ad2a26d516089bceca9bdeaeacd04be50983ea00ba63070f08a3",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://6f2cf1c531122bc7ca96b8c8db6a60deae60441e5223065e792553d4849b5638",
+				"dweb:/ipfs/QmPBdJmBBABMDCfyDjCbdxgiqRavgiSL88SYPGibgbPas9"
+			]
+		},
+		"@openzeppelin/contracts/utils/introspection/ERC165.sol": {
+			"keccak256": "0xd10975de010d89fd1c78dc5e8a9a7e7f496198085c151648f20cba166b32582b",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://fb0048dee081f6fffa5f74afc3fb328483c2a30504e94a0ddd2a5114d731ec4d",
+				"dweb:/ipfs/QmZptt1nmYoA5SgjwnSgWqgUSDgm4q52Yos3xhnMv3MV43"
+			]
+		},
+		"@openzeppelin/contracts/utils/introspection/IERC165.sol": {
+			"keccak256": "0x447a5f3ddc18419d41ff92b3773fb86471b1db25773e07f877f548918a185bf1",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://be161e54f24e5c6fae81a12db1a8ae87bc5ae1b0ddc805d82a1440a68455088f",
+				"dweb:/ipfs/QmP7C3CHdY9urF4dEMb9wmsp1wMxHF6nhA2yQE5SKiPAdy"
+			]
+		},
+		"@openzeppelin/contracts/utils/structs/EnumerableSet.sol": {
+			"keccak256": "0x5050943b32b6a8f282573d166b2e9d87ab7eb4dbba4ab6acf36ecb54fe6995e4",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://d4831d777a29ebdf9f2caecd70e74b97bff1b70e53622fd0a02aed01e21c8271",
+				"dweb:/ipfs/QmUqurVVnCc7XkMxb2k23TVQUtuhHZduJ3hTZarTJrqU24"
+			]
+		},
+		"contracts/Doctor.sol": {
+			"keccak256": "0xb1cdfbfa349b9f4ace4790ea9f178c1d9439a472a2e06acead03ec670fdb1f99",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://59b3d941f3ca13e923f48c6cb8625dd05e8b69650544d685772fba66a941b7cd",
+				"dweb:/ipfs/QmWzq1qbJ1sCPDTUu7beHgmZNLKpyksiorui5kYwdW9oBs"
+			]
+		},
+		"contracts/DoctorFactory.sol": {
+			"keccak256": "0xd72b17137bf3518f793626cf75c7b36717e234902e8b8532aa5e28e15e776c8f",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://15802176e887309106b348373fcc1aa241079951979846882fdd9bf3ba75fd5a",
+				"dweb:/ipfs/QmPupCYx43TguXbjan2DpGyJyotVQ5rdjPeexYXKWTwHX2"
+			]
+		},
+		"contracts/Helper.sol": {
+			"keccak256": "0x6479a2d2ae286386b88602e570bef7e4fdd137e2af83721795d7db7a8b01a6f9",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://3d2d32e638a4f24b7eab31ec24a4923f54e89785678b75b05cd9d27d501c82ca",
+				"dweb:/ipfs/QmbV4qANJ21Rw5J2iW3L7bmAKuFLNDzmvLFz7UN57UqDxg"
+			]
+		},
+		"contracts/Manager.sol": {
+			"keccak256": "0x57db1553d068332b369fe425db28db5ccccc33121e5efbcd5f5c72dd939bab8a",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://1a388af489abd2c9eb44d43df20dc0654ff833dd15707f70abda71ee986a222f",
+				"dweb:/ipfs/QmTzzshDVvPNijhdVChmBRN5qJePuEM7fw2X2SB2wNUvgU"
+			]
+		},
+		"contracts/Patient.sol": {
+			"keccak256": "0x0268faf25bcb8e1c2becfa08d34ae77a18e27cce567223df7050e2f79b7104ee",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://0927beab6019b17e76f17d47a8790a4b9349b3c3ce62ca870bd02621826b07a1",
+				"dweb:/ipfs/QmeyXF4sMSkGHcJg8a4qsPA8CdjRSTzxLrQo9viyYsuXxD"
+			]
+		},
+		"contracts/PatientFactory.sol": {
+			"keccak256": "0x248049c4ab86f18c03e4f75f1f424cc3e6d0ab49247ae2fbea22e389bce71cec",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://227daa4fdb3bbfa342dc1c7b7b788666ec896102b3722268637ab2b06ad803bb",
+				"dweb:/ipfs/QmPJ3UHzindBH23ARbU5pLJxrmAsYFknZGAXquCj22QiRG"
+			]
+		},
+		"contracts/Treatment.sol": {
+			"keccak256": "0x141886ce035365583c2f98db2581573f516974c9b0d794c0c2a4630e15b6a125",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://7b66acb14c9b283a2fe9d5cb077ded8d3fab66f119e23f20c2d045a9fa9469b2",
+				"dweb:/ipfs/QmZER6WugK5BsenwnPAvBua2dbDuZnzw5MjVdEGzXxbmSp"
+			]
+		},
+		"contracts/TreatmentFactory.sol": {
+			"keccak256": "0x6c03e82845e8c74b4aa8e308cb0a76a0e4cd54407eae9e0366f46bc74ece66aa",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://ef3ebcdc49176ba7f7303b1da93b010adc68b762622c65ad2df55adc5849a854",
+				"dweb:/ipfs/QmRbZ38Ax4oZCXtydLrAuGSfo84ETbYUf3ba5ZGCNYGp9u"
+			]
+		}
+	},
+	"version": 1
+}

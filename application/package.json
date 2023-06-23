@@ -1,0 +1,29 @@
+{
+  "name": "hello-blockchain-sveltekit",
+  "version": "1.0.0",
+  "description": "",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.3.3",
+    "@truffle/hdwallet-provider": "^2.1.4",
+    "axios": "^1.2.2",
+    "cli-progress": "^3.11.2",
+    "csv": "^6.2.5",
+    "dotenv": "^16.0.3",
+    "envfile": "^6.18.0",
+    "json2csv": "^5.0.7",
+    "log-with-statusbar": "^1.2.0",
+    "moment": "^2.29.4",
+    "mysql2": "^2.3.3",
+    "svelte-qrcode": "^1.0.0",
+    "truffle-contract-size": "^2.0.1"
+  }
+}

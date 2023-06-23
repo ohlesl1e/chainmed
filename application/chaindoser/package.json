@@ -1,0 +1,39 @@
+{
+	"name": "sveltekit",
+	"version": "0.0.1",
+	"private": true,
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"test": "npm run build && npm run preview",
+		"local": "vite preview --host"
+	},
+	"devDependencies": {
+		"@sveltejs/adapter-auto": "next",
+		"@sveltejs/kit": "next",
+		"svelte": "^3.44.0",
+		"vite": "^3.1.0"
+	},
+	"type": "module",
+	"dependencies": {
+		"@openzeppelin/contracts": "^4.7.3",
+		"@sveltejs/adapter-node": "^1.0.0-next.99",
+		"@sveltejs/adapter-static": "^1.0.0-next.48",
+		"@vitejs/plugin-basic-ssl": "^0.1.2",
+		"axios": "^1.3.2",
+		"chart.js": "^3.9.1",
+		"chartjs-adapter-moment": "^1.0.1",
+		"ethers": "^5.5.1",
+		"html5-qrcode": "^2.3.4",
+		"jsonwebtoken": "^8.5.1",
+		"moment": "^2.29.4",
+		"mysql2": "^2.3.3",
+		"qrcode-scanner-svelte": "^1.0.0",
+		"siwe": "^1.1.6",
+		"svelte-chartjs": "^3.0.1",
+		"svelte-loading-spinners": "^0.3.4",
+		"unocss": "^0.45.30",
+		"web-push": "^3.5.0"
+	}
+}
