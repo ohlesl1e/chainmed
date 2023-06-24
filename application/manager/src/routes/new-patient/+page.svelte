@@ -137,11 +137,11 @@
 			console.log(encrypted);
 
 			const tx = await $managerContract.addPatient(
-				[utils.formatBytes32String(name), utils.formatBytes32String(gender)],
-				new Date(dob).getTime() / 1000,
-				[height, Math.ceil(weight * 100)],
-				allergy,
-				[alcohol, smoke, cannabis],
+				// [utils.formatBytes32String(name), utils.formatBytes32String(gender)],
+				// new Date(dob).getTime() / 1000,
+				// [height, Math.ceil(weight * 100)],
+				// allergy,
+				// [alcohol, smoke, cannabis],
 				[false, await $provider.getSigner().getAddress()],
 				new Uint8Array(encrypted).join()
 			);

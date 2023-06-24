@@ -15,11 +15,11 @@ contract PatientFactory is Ownable {
 
     function createPatient(
         address owner_,
-        Bytes32Pair memory nameGender_,
-        uint256 dob_,
-        SmallUintPair memory physique_,
-        string[] memory allergy_,
-        BoolTriple memory habits_,
+        // Bytes32Pair memory nameGender_,
+        // uint256 dob_,
+        // SmallUintPair memory physique_,
+        // string[] memory allergy_,
+        // BoolTriple memory habits_,
         FromAppOption memory option_,
         string memory info_
     ) external onlyOwner returns (address clone) {
@@ -29,11 +29,11 @@ contract PatientFactory is Ownable {
                 msg.sender,
                 owner_,
                 option_.addr,
-                nameGender_,
-                dob_,
-                physique_,
-                allergy_,
-                habits_,
+                // nameGender_,
+                // dob_,
+                // physique_,
+                // allergy_,
+                // habits_,
                 info_
             );
         } else {
@@ -41,11 +41,11 @@ contract PatientFactory is Ownable {
                 msg.sender,
                 owner_,
                 address(0),
-                nameGender_,
-                dob_,
-                physique_,
-                allergy_,
-                habits_,
+                // nameGender_,
+                // dob_,
+                // physique_,
+                // allergy_,
+                // habits_,
                 info_
             );
         }

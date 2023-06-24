@@ -78,11 +78,11 @@ contract Patient is AccessControlEnumerable {
         address manager_,
         address owner_,
         address app_,
-        Bytes32Pair memory nameGender_,
-        uint256 dob_,
-        SmallUintPair memory physique_,
-        string[] memory allergy_,
-        BoolTriple memory alcoholSmokeCannabis_,
+        // Bytes32Pair memory nameGender_,
+        // uint256 dob_,
+        // SmallUintPair memory physique_,
+        // string[] memory allergy_,
+        // BoolTriple memory alcoholSmokeCannabis_,
         string memory info_
     ) external {
         require(init == false, "Already initialized");
@@ -94,15 +94,15 @@ contract Patient is AccessControlEnumerable {
         _setupRole(PATIENT_ROLE, owner_);
         _setupRole(MANAGER_ROLE, manager_);
         if (app_ != address(0)) _setupRole(APPLICATION_ROLE, app_);
-        name = nameGender_.value1;
-        gender = nameGender_.value2;
-        dob = dob_;
-        height = physique_.value1;
-        weight = physique_.value2;
-        allergy = allergy_;
-        alcohol = alcoholSmokeCannabis_.value1;
-        smoke = alcoholSmokeCannabis_.value2;
-        cannabis = alcoholSmokeCannabis_.value3;
+        // name = nameGender_.value1;
+        // gender = nameGender_.value2;
+        // dob = dob_;
+        // height = physique_.value1;
+        // weight = physique_.value2;
+        // allergy = allergy_;
+        // alcohol = alcoholSmokeCannabis_.value1;
+        // smoke = alcoholSmokeCannabis_.value2;
+        // cannabis = alcoholSmokeCannabis_.value3;
         info = info_;
         init = true;
     }
@@ -111,59 +111,42 @@ contract Patient is AccessControlEnumerable {
         external
         view
         canRead
-        returns (
-            Bytes32Pair memory,
-            uint256,
-            SmallUintPair memory,
-            string[] memory,
-            BoolTriple memory,
-            address[] memory,
-            address[] memory
-        )
+        returns (address[] memory, address[] memory, string memory)
     {
-        string[] memory allergy_ = allergy;
         address[] memory treatments_ = new address[](treatments.length);
         for (uint256 index = 0; index < treatments_.length; index++) {
             treatments_[index] = treatments[index];
         }
 
-        return (
-            Bytes32Pair(name, gender),
-            dob,
-            SmallUintPair(height, weight),
-            allergy_,
-            BoolTriple(alcohol, smoke, cannabis),
-            treatments_,
-            requests
-        );
+        return (treatments_, requests, info);
     }
 
-    function setName(bytes32 name_) external onlyPatient {
-        name = name_;
-    }
+    // function setName(bytes32 name_) external onlyPatient {
+    //     name = name_;
+    // }
 
-    function setGender(bytes32 gender_) external onlyPatient {
-        gender = gender_;
-    }
+    // function setGender(bytes32 gender_) external onlyPatient {
+    //     gender = gender_;
+    // }
 
-    function setDob(uint256 dob_) external onlyPatient {
-        dob = dob_;
-    }
+    // function setDob(uint256 dob_) external onlyPatient {
+    //     dob = dob_;
+    // }
 
-    function setPhysique(SmallUintPair memory physique_) external canWrite {
-        height = physique_.value1;
-        weight = physique_.value2;
-    }
+    // function setPhysique(SmallUintPair memory physique_) external canWrite {
+    //     height = physique_.value1;
+    //     weight = physique_.value2;
+    // }
 
-    function setAllergy(string[] memory allergy_) external canWrite {
-        allergy = allergy_;
-    }
+    // function setAllergy(string[] memory allergy_) external canWrite {
+    //     allergy = allergy_;
+    // }
 
-    function setHabits(BoolTriple memory habits_) external canWrite {
-        alcohol = habits_.value1;
-        smoke = habits_.value2;
-        cannabis = habits_.value3;
-    }
+    // function setHabits(BoolTriple memory habits_) external canWrite {
+    //     alcohol = habits_.value1;
+    //     smoke = habits_.value2;
+    //     cannabis = habits_.value3;
+    // }
 
     function addTreatment(
         address treatment_

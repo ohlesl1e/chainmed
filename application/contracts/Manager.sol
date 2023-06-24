@@ -50,22 +50,22 @@ contract Manager is AccessControl {
     }
 
     function addPatient(
-        Bytes32Pair memory nameGender_,
-        uint256 dob_,
-        SmallUintPair memory physique_,
-        string[] memory allergy_,
-        BoolTriple memory habits_,
+        // Bytes32Pair memory nameGender_,
+        // uint256 dob_,
+        // SmallUintPair memory physique_,
+        // string[] memory allergy_,
+        // BoolTriple memory habits_,
         FromAppOption memory option_,
         string memory info_
     ) external {
         require(patients[option_.addr] == address(0), "Profile existed");
         patients[option_.addr] = patientFactory.createPatient(
             option_.addr,
-            nameGender_,
-            dob_,
-            physique_,
-            allergy_,
-            habits_,
+            // nameGender_,
+            // dob_,
+            // physique_,
+            // allergy_,
+            // habits_,
             FromAppOption(option_.fromApp, msg.sender),
             info_
         );
