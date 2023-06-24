@@ -12,3 +12,7 @@ application/server/contracts
 .deps
 application/server/jwtRS256.key.pub
 application/client/src/lib/jwtRS256.key.pub
+application/build/*
+application/chaindoser/src/lib/contracts/*
+application/contracts/artifacts/*
+application/manager/src/lib/contracts/*

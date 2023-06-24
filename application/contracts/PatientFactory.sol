@@ -20,7 +20,8 @@ contract PatientFactory is Ownable {
         SmallUintPair memory physique_,
         string[] memory allergy_,
         BoolTriple memory habits_,
-        FromAppOption memory option_
+        FromAppOption memory option_,
+        string memory info_
     ) external onlyOwner returns (address clone) {
         clone = Clones.clone(patientImplementation);
         if (option_.fromApp) {
@@ -32,7 +33,8 @@ contract PatientFactory is Ownable {
                 dob_,
                 physique_,
                 allergy_,
-                habits_
+                habits_,
+                info_
             );
         } else {
             Patient(clone).initialize(
@@ -43,7 +45,8 @@ contract PatientFactory is Ownable {
                 dob_,
                 physique_,
                 allergy_,
-                habits_
+                habits_,
+                info_
             );
         }
     }

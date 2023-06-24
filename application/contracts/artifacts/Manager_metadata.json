@@ -236,22 +236,14 @@
 						"internalType": "struct FromAppOption",
 						"name": "option_",
 						"type": "tuple"
+					},
+					{
+						"internalType": "string",
+						"name": "info_",
+						"type": "string"
 					}
 				],
 				"name": "addPatient",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "patient_",
-						"type": "address"
-					}
-				],
-				"name": "applicationRequest",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -614,27 +606,27 @@
 			]
 		},
 		"contracts/Manager.sol": {
-			"keccak256": "0x57db1553d068332b369fe425db28db5ccccc33121e5efbcd5f5c72dd939bab8a",
+			"keccak256": "0x19ec948ab8dd71da312ae5710f6cbb999160c64af00126eea568435a27794016",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://1a388af489abd2c9eb44d43df20dc0654ff833dd15707f70abda71ee986a222f",
-				"dweb:/ipfs/QmTzzshDVvPNijhdVChmBRN5qJePuEM7fw2X2SB2wNUvgU"
+				"bzz-raw://05ff27aef844c625c2113b490135bf9d25f2f6a26f2f4c2641a98e6116e29057",
+				"dweb:/ipfs/QmQ6fx1FxrhPsfBZfojXxKZeZUPmSTK3RUpfYiGYK67gC4"
 			]
 		},
 		"contracts/Patient.sol": {
-			"keccak256": "0x0268faf25bcb8e1c2becfa08d34ae77a18e27cce567223df7050e2f79b7104ee",
+			"keccak256": "0xddab08787cf6f6778b5b6f401fdee78e28a5d532ad6665f5cc3f14d058ee31b6",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://0927beab6019b17e76f17d47a8790a4b9349b3c3ce62ca870bd02621826b07a1",
-				"dweb:/ipfs/QmeyXF4sMSkGHcJg8a4qsPA8CdjRSTzxLrQo9viyYsuXxD"
+				"bzz-raw://9366a7416622349ac2c09faa9f23af103c41d6d7e499dbeec880a0ff32fe6348",
+				"dweb:/ipfs/QmYMJMgxZvWuoaZPc73tAwZG1Y4nNJE4KDhwgVkNaASsAC"
 			]
 		},
 		"contracts/PatientFactory.sol": {
-			"keccak256": "0x248049c4ab86f18c03e4f75f1f424cc3e6d0ab49247ae2fbea22e389bce71cec",
+			"keccak256": "0xbe803bcdbe5f134f9fdadc60298a717941b0bba681c5d761c200f60306337f96",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://227daa4fdb3bbfa342dc1c7b7b788666ec896102b3722268637ab2b06ad803bb",
-				"dweb:/ipfs/QmPJ3UHzindBH23ARbU5pLJxrmAsYFknZGAXquCj22QiRG"
+				"bzz-raw://e4ff79a38f20032be1a0a0bc2becf96f9c0d6b8f239912276acc00c0cf382dcf",
+				"dweb:/ipfs/QmcdHMxnMPM5vM7AL1wfYMGB16u6YieDoQz12aM7dEnFPn"
 			]
 		},
 		"contracts/Treatment.sol": {

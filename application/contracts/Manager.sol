@@ -55,7 +55,8 @@ contract Manager is AccessControl {
         SmallUintPair memory physique_,
         string[] memory allergy_,
         BoolTriple memory habits_,
-        FromAppOption memory option_
+        FromAppOption memory option_,
+        string memory info_
     ) external {
         require(patients[option_.addr] == address(0), "Profile existed");
         patients[option_.addr] = patientFactory.createPatient(
@@ -65,7 +66,8 @@ contract Manager is AccessControl {
             physique_,
             allergy_,
             habits_,
-            FromAppOption(option_.fromApp, msg.sender)
+            FromAppOption(option_.fromApp, msg.sender),
+            info_
         );
     }
 
@@ -92,11 +94,5 @@ contract Manager is AccessControl {
                 docInfo[i] = DoctorStruct(name, affiliate);
             }
         }
-    }
-
-    function applicationRequest(address patient_) external {
-        require(patients[patient_] != address(0), "Patient is not a user");
-        Patient patient = Patient(patients[patient_]);
-        patient.appRequestAccess(msg.sender);
     }
 }

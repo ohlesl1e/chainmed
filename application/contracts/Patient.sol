@@ -11,6 +11,7 @@ contract Patient is AccessControlEnumerable {
     bytes32 public constant APPLICATION_ROLE = keccak256("APPLICATION_ROLE");
     bytes32 public constant DOCTOR_ROLE = keccak256("DOCTOR_ROLE");
 
+    string private info;
     bytes32 private name;
     bytes32 private gender;
     uint256 private dob;
@@ -24,7 +25,6 @@ contract Patient is AccessControlEnumerable {
     address[] private treatments;
     address[] private requests;
     mapping(address => bool) private doctorQueue;
-    mapping(address => bool) private appQueue;
 
     constructor() {
         _setRoleAdmin(PATIENT_ROLE, DEFAULT_ADMIN_ROLE);
@@ -82,7 +82,8 @@ contract Patient is AccessControlEnumerable {
         uint256 dob_,
         SmallUintPair memory physique_,
         string[] memory allergy_,
-        BoolTriple memory alcoholSmokeCannabis_
+        BoolTriple memory alcoholSmokeCannabis_,
+        string memory info_
     ) external {
         require(init == false, "Already initialized");
         _setRoleAdmin(PATIENT_ROLE, DEFAULT_ADMIN_ROLE);
@@ -102,6 +103,7 @@ contract Patient is AccessControlEnumerable {
         alcohol = alcoholSmokeCannabis_.value1;
         smoke = alcoholSmokeCannabis_.value2;
         cannabis = alcoholSmokeCannabis_.value3;
+        info = info_;
         init = true;
     }
 
@@ -199,12 +201,6 @@ contract Patient is AccessControlEnumerable {
         require(!doctorQueue[doctor_], "You already requested access");
         requests.push(doctor_);
         doctorQueue[doctor_] = true;
-    }
-
-    function appRequestAccess(address app_) external {
-        require(!appQueue[app_], "You already requested access");
-        requests.push(app_);
-        appQueue[app_] = true;
     }
 
     function getRequestQueue()

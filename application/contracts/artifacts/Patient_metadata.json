@@ -180,19 +180,6 @@
 				"inputs": [
 					{
 						"internalType": "address",
-						"name": "app_",
-						"type": "address"
-					}
-				],
-				"name": "appRequestAccess",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
 						"name": "user_",
 						"type": "address"
 					}
@@ -226,80 +213,9 @@
 				"name": "getInfo",
 				"outputs": [
 					{
-						"components": [
-							{
-								"internalType": "bytes32",
-								"name": "value1",
-								"type": "bytes32"
-							},
-							{
-								"internalType": "bytes32",
-								"name": "value2",
-								"type": "bytes32"
-							}
-						],
-						"internalType": "struct Bytes32Pair",
+						"internalType": "string",
 						"name": "",
-						"type": "tuple"
-					},
-					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
-					},
-					{
-						"components": [
-							{
-								"internalType": "uint16",
-								"name": "value1",
-								"type": "uint16"
-							},
-							{
-								"internalType": "uint16",
-								"name": "value2",
-								"type": "uint16"
-							}
-						],
-						"internalType": "struct SmallUintPair",
-						"name": "",
-						"type": "tuple"
-					},
-					{
-						"internalType": "string[]",
-						"name": "",
-						"type": "string[]"
-					},
-					{
-						"components": [
-							{
-								"internalType": "bool",
-								"name": "value1",
-								"type": "bool"
-							},
-							{
-								"internalType": "bool",
-								"name": "value2",
-								"type": "bool"
-							},
-							{
-								"internalType": "bool",
-								"name": "value3",
-								"type": "bool"
-							}
-						],
-						"internalType": "struct BoolTriple",
-						"name": "",
-						"type": "tuple"
-					},
-					{
-						"internalType": "address[]",
-						"name": "",
-						"type": "address[]"
-					},
-					{
-						"internalType": "address[]",
-						"name": "",
-						"type": "address[]"
+						"type": "string"
 					}
 				],
 				"stateMutability": "view",
@@ -518,6 +434,11 @@
 						"internalType": "struct BoolTriple",
 						"name": "alcoholSmokeCannabis_",
 						"type": "tuple"
+					},
+					{
+						"internalType": "string",
+						"name": "info_",
+						"type": "string"
 					}
 				],
 				"name": "initialize",
@@ -847,11 +768,11 @@
 			]
 		},
 		"contracts/Patient.sol": {
-			"keccak256": "0x4c10f5aa8504f470fc7f90027bb8e71c29b0b7afedd79a63047d648102976698",
+			"keccak256": "0xddab08787cf6f6778b5b6f401fdee78e28a5d532ad6665f5cc3f14d058ee31b6",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://bf080e33494c919882ce136e008e20f4f17c0e723bb4629c321a8683963a7c5f",
-				"dweb:/ipfs/QmTKicVwTAhfoC7a9WwDoedhpuJ4Z9kaeuvaGCHcd7jBq4"
+				"bzz-raw://9366a7416622349ac2c09faa9f23af103c41d6d7e499dbeec880a0ff32fe6348",
+				"dweb:/ipfs/QmYMJMgxZvWuoaZPc73tAwZG1Y4nNJE4KDhwgVkNaASsAC"
 			]
 		},
 		"contracts/Treatment.sol": {

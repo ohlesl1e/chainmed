@@ -7,6 +7,7 @@
 	import { provider } from '$lib/store';
 	import { ethers, utils, BigNumber, Contract } from 'ethers';
 	import { patientContract, managerContract } from '$lib/store';
+	import { sha256 } from 'js-sha256';
 	// import { QRious } from "@phippsytech/svelte-qrious";
 
 	const APPLICATION_ROLE = utils.id('APPLICATION_ROLE');
@@ -73,76 +74,100 @@
 		patientContract.set(new ethers.Contract(patientAddress, Patient.abi, $provider.getSigner()));
 
 		try {
-			const info = await $patientContract.getInfo();
-			let dob = new Date(BigNumber.from(info[1]).toNumber() * 1000);
-			console.log({ requests: info[6] });
-			tempAllergy = info[3];
-			profile = {
-				id: patientAddress,
-				name: utils.parseBytes32String(info[0][0]),
-				gender: utils.parseBytes32String(info[0][1]),
-				dob: `${dob.getFullYear()}-${(dob.getMonth() + 1).toString().padStart(2, '0')}-${(
-					dob.getDate() + 1
-				)
-					.toString()
-					.padStart(2, '0')}`,
-				height: info[2][0],
-				weight: info[2][1] / 100,
-				allergy: info[3],
-				alcohol: info[4][0],
-				smoke: info[4][1],
-				cannabis: info[4][2],
-				treatments: [],
-				requests: []
-			};
-			changedProfile = {
-				id: patientAddress,
-				name: utils.parseBytes32String(info[0][0]),
-				gender: utils.parseBytes32String(info[0][1]),
-				dob: `${dob.getFullYear()}-${(dob.getMonth() + 1).toString().padStart(2, '0')}-${(
-					dob.getDate() + 1
-				)
-					.toString()
-					.padStart(2, '0')}`,
-				height: info[2][0],
-				weight: info[2][1] / 100,
-				allergy: info[3],
-				alcohol: info[4][0],
-				smoke: info[4][1],
-				cannabis: info[4][2],
-				treatments: [],
-				requests: info[6] ? info[6] : []
-			};
-			if (info[6].length) {
-				for (const request of info[6]) {
-					const doctorAddress = await $managerContract.getDoctor(request);
-					const doctorContract = new ethers.Contract(
-						doctorAddress,
-						Doctor.abi,
-						$provider.getSigner()
-					);
-					console.log({ request, doctorAddress });
-					try {
-						const doctorInfo = await doctorContract.getInfo();
-						console.log({
-							address: request,
-							res: doctorInfo,
-							name: utils.parseBytes32String(doctorInfo[0]),
-							affiliate: utils.parseBytes32String(doctorInfo[1])
-						});
-						profile.requests = [
-							...profile.requests,
-							{
-								address: request,
-								name: utils.parseBytes32String(doctorInfo[0]),
-								affiliate: utils.parseBytes32String(doctorInfo[1])
-							}
-						];
-					} catch (error) {
-						console.log(error);
-					}
-				}
+			const info = new Uint8Array((await $patientContract.getInfo()).split(','));
+			let key = new Uint32Array(localStorage.getItem('key').split(','));
+			let iv = new Uint32Array(localStorage.getItem('iv').split(','));
+			let hash = sha256.update(await $provider.getSigner().getAddress());
+			let newIv = new Uint32Array(hash.arrayBuffer());
+			if (newIv.join() !== iv.join()) {
+				iv = newIv;
+				localStorage.setItem('iv', newIv);
 			}
+			// const uintInfo = new Uint8Array(info.split(','));
+			// console.log({ info: uintInfo });
+			// console.log(uintInfo.buffer);
+			// const buffered = uintInfo.buffer;
+
+			key = await crypto.subtle.importKey('raw', key, 'AES-GCM', true, ['encrypt', 'decrypt']);
+			console.log({ key, iv });
+
+			let decrypted = await crypto.subtle.decrypt(
+				{ name: 'AES-GCM', iv: iv.buffer },
+				key,
+				info.buffer
+			);
+			let dec = new TextDecoder();
+
+			console.log({ decrypted: JSON.parse(dec.decode(decrypted)) });
+			// let dob = new Date(BigNumber.from(info[1]).toNumber() * 1000);
+			// console.log({ requests: info[6] });
+			// tempAllergy = info[3];
+			// profile = {
+			// 	id: patientAddress,
+			// 	name: utils.parseBytes32String(info[0][0]),
+			// 	gender: utils.parseBytes32String(info[0][1]),
+			// 	dob: `${dob.getFullYear()}-${(dob.getMonth() + 1).toString().padStart(2, '0')}-${(
+			// 		dob.getDate() + 1
+			// 	)
+			// 		.toString()
+			// 		.padStart(2, '0')}`,
+			// 	height: info[2][0],
+			// 	weight: info[2][1] / 100,
+			// 	allergy: info[3],
+			// 	alcohol: info[4][0],
+			// 	smoke: info[4][1],
+			// 	cannabis: info[4][2],
+			// 	treatments: [],
+			// 	requests: []
+			// };
+			// changedProfile = {
+			// 	id: patientAddress,
+			// 	name: utils.parseBytes32String(info[0][0]),
+			// 	gender: utils.parseBytes32String(info[0][1]),
+			// 	dob: `${dob.getFullYear()}-${(dob.getMonth() + 1).toString().padStart(2, '0')}-${(
+			// 		dob.getDate() + 1
+			// 	)
+			// 		.toString()
+			// 		.padStart(2, '0')}`,
+			// 	height: info[2][0],
+			// 	weight: info[2][1] / 100,
+			// 	allergy: info[3],
+			// 	alcohol: info[4][0],
+			// 	smoke: info[4][1],
+			// 	cannabis: info[4][2],
+			// 	treatments: [],
+			// 	requests: info[6] ? info[6] : []
+			// };
+			// if (info[6].length) {
+			// 	for (const request of info[6]) {
+			// 		const doctorAddress = await $managerContract.getDoctor(request);
+			// 		const doctorContract = new ethers.Contract(
+			// 			doctorAddress,
+			// 			Doctor.abi,
+			// 			$provider.getSigner()
+			// 		);
+			// 		console.log({ request, doctorAddress });
+			// 		try {
+			// 			const doctorInfo = await doctorContract.getInfo();
+			// 			console.log({
+			// 				address: request,
+			// 				res: doctorInfo,
+			// 				name: utils.parseBytes32String(doctorInfo[0]),
+			// 				affiliate: utils.parseBytes32String(doctorInfo[1])
+			// 			});
+			// 			profile.requests = [
+			// 				...profile.requests,
+			// 				{
+			// 					address: request,
+			// 					name: utils.parseBytes32String(doctorInfo[0]),
+			// 					affiliate: utils.parseBytes32String(doctorInfo[1])
+			// 				}
+			// 			];
+			// 		} catch (error) {
+			// 			console.log(error);
+			// 		}
+			// 	}
+			// }
 
 			//Access management
 

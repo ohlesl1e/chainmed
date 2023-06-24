@@ -5,6 +5,7 @@
 	// import axios from 'axios';
 	import { provider } from '$lib/store';
 	import { managerContract } from '$lib/store';
+	import { sha256 } from 'js-sha256';
 	const BACKEND_ADDR = '/api';
 
 	const foodAllergy = [
@@ -51,6 +52,8 @@
 	let cannabis = false;
 
 	let loading = false;
+	let showModal = false;
+	let key = undefined;
 
 	const handleSubmit = async () => {
 		loading = true;
@@ -67,38 +70,89 @@
 		});
 
 		try {
+			const random = crypto.randomUUID();
+			let hash = sha256.update(random);
+			// hash.update(random);
+			// console.log(await $provider.getSigner().getAddress());
+			// let key = hash.hex().substring(0, 32);
+			key = await crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, true, [
+				'encrypt',
+				'decrypt'
+			]);
+			let address = await $provider.getSigner().getAddress();
+			console.log({ address });
+			let hash2 = sha256.update(address);
+			let iv = hash2.arrayBuffer();
+			// console.log({ key: await crypto.subtle.exportKey('raw', key), iv });
+			let enc = new TextEncoder();
+
+			let encrypted = await crypto.subtle.encrypt(
+				{ name: 'AES-GCM', iv },
+				key,
+				enc.encode(
+					JSON.stringify({
+						name,
+						gender,
+						dob,
+						height,
+						weight,
+						allergy,
+						alcohol,
+						smoke,
+						cannabis
+					})
+				)
+			);
+
+			console.log({
+				json: JSON.stringify({
+					name,
+					gender,
+					dob,
+					height,
+					weight,
+					allergy,
+					alcohol,
+					smoke,
+					cannabis
+				}),
+				encoded: enc.encode(
+					JSON.stringify({
+						name,
+						gender,
+						dob,
+						height,
+						weight,
+						allergy,
+						alcohol,
+						smoke,
+						cannabis
+					})
+				)
+			});
+
+			localStorage.setItem('key', new Uint32Array(await crypto.subtle.exportKey('raw', key)));
+			localStorage.setItem('iv', new Uint32Array(iv));
+
+			console.log(encrypted);
+
 			const tx = await $managerContract.addPatient(
 				[utils.formatBytes32String(name), utils.formatBytes32String(gender)],
 				new Date(dob).getTime() / 1000,
 				[height, Math.ceil(weight * 100)],
 				allergy,
 				[alcohol, smoke, cannabis],
-				[false, await $provider.getSigner().getAddress()]
+				[false, await $provider.getSigner().getAddress()],
+				new Uint8Array(encrypted).join()
 			);
 			const receipt = await tx.wait();
-			let address = await $provider.getSigner().getAddress();
 			console.log({ tx, receipt, address });
-			goto('/');
-			// axios
-			// 	.post(
-			// 		`/api/signup`,
-			// 		{ address },
-			// 		{
-			// 			headers: {
-			// 				'Content-Type': 'application/json'
-			// 				// "xsrf-token": preflight.data.csrfToken,
-			// 			},
-			// 			withCredentials: true
-			// 		}
-			// 	)
-			// 	.then(async (res) => {
-			// 		loading = false;
-			// 		localStorage.setItem('token', res.data.token);
-			// 		window.location.href = '/dashboard';
-			// 	})
-			// 	.catch((err) => {
-			// 		console.log(err);
-			// 	});
+			key = new Uint32Array(await crypto.subtle.exportKey('raw', key));
+			console.log({ key });
+			loading = false;
+			showModal = true;
+			modal.showModal();
+			// goto('/');
 		} catch (error) {
 			console.log(error);
 			loading = false;
@@ -107,6 +161,18 @@
 </script>
 
 <div class="max-w-lg mx-auto">
+	{#if key && showModal}
+		<div
+			class="fixed top-0 left-0 w-full h-full bg-opacity-50 bg-black flex justify-center items-center break-words"
+		>
+			<div class="bg-white p-4 rounded-md max-w-sm text-center">
+				<h2 class="h2">Keep this key somewhere safe</h2>
+				<p>{key.join()}</p>
+				<button on:click={() => goto('/')}>Close</button>
+			</div>
+		</div>
+	{/if}
+
 	<form
 		class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
 		on:submit|preventDefault={handleSubmit}

@@ -39,7 +39,8 @@ abstract contract Application {
         uint256 dob_,
         SmallUintPair memory physique_,
         string[] memory allergy_,
-        BoolTriple memory habits_
+        BoolTriple memory habits_,
+        string memory info_
     ) external {
         require(
             manager.getPatient(msg.sender) == address(0),
@@ -51,7 +52,8 @@ abstract contract Application {
             physique_,
             allergy_,
             habits_,
-            FromAppOption(true, msg.sender)
+            FromAppOption(true, msg.sender),
+            info_
         );
     }
 }
