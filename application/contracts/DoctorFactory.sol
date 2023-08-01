@@ -16,26 +16,9 @@ contract DoctorFactory is Ownable {
     function createDoctor(
         address doctor_,
         bytes32 name_,
-        bytes32 affiliate_,
-        FromAppOption memory option_
+        bytes32 affiliate_
     ) external onlyOwner returns (address clone) {
         clone = Clones.clone(doctorImplementation);
-        if (option_.fromApp) {
-            Doctor(clone).initialize(
-                doctor_,
-                option_.addr,
-                msg.sender,
-                name_,
-                affiliate_
-            );
-        } else {
-            Doctor(clone).initialize(
-                doctor_,
-                address(0),
-                msg.sender,
-                name_,
-                affiliate_
-            );
-        }
+        Doctor(clone).initialize(doctor_, msg.sender, name_, affiliate_);
     }
 }

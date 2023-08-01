@@ -1,12 +1,13 @@
 <script>
-	import { goto } from '$app/navigation';
 	import { onMount } from 'svelte';
 	import Patient from '$lib/contracts/Patient.json';
 	import Application from '$lib/contracts/Application.json';
 	import Doctor from '$lib/contracts/Doctor.json';
 	import { provider } from '$lib/store';
-	import { ethers, utils, BigNumber, Contract } from 'ethers';
+	import { ethers, utils, Contract } from 'ethers';
 	import { patientContract, managerContract } from '$lib/store';
+	import { encryptInfo, getCurrentKeyAndIv } from '$lib/crypto';
+	import _ from 'lodash';
 	// import { QRious } from "@phippsytech/svelte-qrious";
 
 	const APPLICATION_ROLE = utils.id('APPLICATION_ROLE');
@@ -14,26 +15,32 @@
 
 	let profile;
 	let changedProfile;
+	let applicationQueue;
+	let doctorQueue;
+	let profileUpdates;
 	let tempAllergy;
 	let expanded = false;
-	const domain = window.location.host;
-	const origin = window.location.origin;
 	let init = false;
+	let requests = [];
 	export let patientAddress;
 
 	let qrShowed = false;
 
-	let nameChanged = false;
-	let genderChanged = false;
-	let dobChanged = false;
-	let heightChanged = false;
-	let weightChanged = false;
-	let allergyChanged = false;
-	let alcoholChanged = false;
-	let smokeChanged = false;
-	let cannabisChanged = false;
+	const basicInfo = [
+		'id',
+		'name',
+		'gender',
+		'dob',
+		'height',
+		'weight',
+		'allergy',
+		'alcohol',
+		'smoke',
+		'cannabis',
+		'requests'
+	];
 
-	let reportQueue = [];
+	let infoChanged = false;
 
 	const foodAllergy = [
 		'Balsam of Peru',
@@ -71,50 +78,71 @@
 	onMount(async () => {
 		// let token = sessionStorage.getItem("token").split(".");
 		patientContract.set(new ethers.Contract(patientAddress, Patient.abi, $provider.getSigner()));
-
+		let { key, iv } = await getCurrentKeyAndIv(
+			localStorage.getItem('key'),
+			localStorage.getItem('iv')
+		);
 		try {
-			const info = await $patientContract.getInfo();
-			let dob = new Date(BigNumber.from(info[1]).toNumber() * 1000);
-			console.log({ requests: info[6] });
-			tempAllergy = info[3];
+			console.log({ patientAddress, $patientContract });
+			let info = await $patientContract.getInfo();
+
+			info = new Uint8Array(info.split(','));
+
+			// const uintInfo = new Uint8Array(info.split(','));
+			// console.log({ info: uintInfo });
+			// console.log(uintInfo.buffer);
+			// const buffered = uintInfo.buffer;
+
+			// key = await crypto.subtle.importKey('raw', key, 'AES-GCM', true, ['encrypt', 'decrypt']);
+			// console.log({ key, iv });
+
+			let decrypted;
+			try {
+				decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, info.buffer);
+			} catch (error) {
+				console.log(error);
+				alert('Invalid key');
+				localStorage.removeItem('key');
+				window.location.reload();
+			}
+			let dec = new TextDecoder();
+
+			let { alcohol, allergy, cannabis, dob, gender, height, name, smoke, weight } = JSON.parse(
+				dec.decode(decrypted)
+			);
+			// let dob = new Date(BigNumber.from(info[1]).toNumber() * 1000);
+			// console.log({ requests: info[6] });
+			tempAllergy = allergy;
 			profile = {
-				id: patientAddress,
-				name: utils.parseBytes32String(info[0][0]),
-				gender: utils.parseBytes32String(info[0][1]),
-				dob: `${dob.getFullYear()}-${(dob.getMonth() + 1).toString().padStart(2, '0')}-${(
-					dob.getDate() + 1
-				)
-					.toString()
-					.padStart(2, '0')}`,
-				height: info[2][0],
-				weight: info[2][1] / 100,
-				allergy: info[3],
-				alcohol: info[4][0],
-				smoke: info[4][1],
-				cannabis: info[4][2],
-				treatments: [],
-				requests: []
+				name,
+				gender,
+				dob,
+				height,
+				weight,
+				allergy,
+				alcohol,
+				smoke,
+				cannabis
 			};
 			changedProfile = {
-				id: patientAddress,
-				name: utils.parseBytes32String(info[0][0]),
-				gender: utils.parseBytes32String(info[0][1]),
-				dob: `${dob.getFullYear()}-${(dob.getMonth() + 1).toString().padStart(2, '0')}-${(
-					dob.getDate() + 1
-				)
-					.toString()
-					.padStart(2, '0')}`,
-				height: info[2][0],
-				weight: info[2][1] / 100,
-				allergy: info[3],
-				alcohol: info[4][0],
-				smoke: info[4][1],
-				cannabis: info[4][2],
-				treatments: [],
-				requests: info[6] ? info[6] : []
+				name,
+				gender,
+				dob,
+				height,
+				weight,
+				allergy,
+				alcohol,
+				smoke,
+				cannabis
 			};
-			if (info[6].length) {
-				for (const request of info[6]) {
+		} catch (error) {
+			console.log(error);
+		}
+
+		try {
+			let tempRequests = await $patientContract.getRequests();
+			if (tempRequests.length) {
+				for (const request of tempRequests) {
 					const doctorAddress = await $managerContract.getDoctor(request);
 					const doctorContract = new ethers.Contract(
 						doctorAddress,
@@ -130,8 +158,8 @@
 							name: utils.parseBytes32String(doctorInfo[0]),
 							affiliate: utils.parseBytes32String(doctorInfo[1])
 						});
-						profile.requests = [
-							...profile.requests,
+						requests = [
+							...requests,
 							{
 								address: request,
 								name: utils.parseBytes32String(doctorInfo[0]),
@@ -143,9 +171,11 @@
 					}
 				}
 			}
-
+		} catch (error) {
+			console.log(error);
+		}
+		try {
 			//Access management
-
 			const applicationQueueLength = (
 				await $patientContract.getRoleMemberCount(APPLICATION_ROLE)
 			).toNumber();
@@ -179,8 +209,8 @@
 				});
 				console.log({ docAddress, docInfo });
 			}
-			profile.appQueue = appQueue;
-			profile.docQueue = docQueue;
+			applicationQueue = appQueue;
+			doctorQueue = docQueue;
 
 			console.log({ profile });
 
@@ -188,69 +218,81 @@
 		} catch (error) {
 			console.log(error);
 		}
+
+		try {
+			// let { key, iv } = await getCurrentKeyAndIv(
+			// 	localStorage.getItem('key'),
+			// 	localStorage.getItem('iv')
+			// );
+			let dec = new TextDecoder();
+			let updates = await $patientContract.getUpdates();
+			let tempUpdates = [];
+			for (let index = 0; index < updates.length; index++) {
+				const update = new Uint8Array(updates[index].split(','));
+				// console.log({ update });
+				let decrypted;
+				try {
+					decrypted = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, update);
+					const updateEntry = JSON.parse(dec.decode(decrypted));
+					const objKeys = _.union(Object.keys(profile), Object.keys(updateEntry));
+					const differences = objKeys.reduce((result, key) => {
+						if (!_.isEqual(profile[key], updateEntry[key])) {
+							result[key] = `${_.has(profile, key) ? profile[key] : 'undefined'} -> ${
+								_.has(updateEntry, key) ? updateEntry[key] : 'undefined'
+							}`;
+						}
+						return result;
+					}, {});
+					tempUpdates.push(differences);
+				} catch (error) {
+					console.log(error);
+					tempUpdates.push('Error decrypting');
+				}
+			}
+					tempUpdates.push('Error decrypting');
+			profileUpdates = tempUpdates;
+			console.log({ profileUpdates });
+		} catch (error) {
+			console.log(error);
+		}
 	});
 
-	const checkName = () => {
-		nameChanged = profile.name === changedProfile.name ? false : true;
+	const checkChange = () => {
+		infoChanged = !_.isEqual(profile, changedProfile);
 	};
 
-	const checkGender = () => {
-		genderChanged = profile.gender === changedProfile.gender ? false : true;
-	};
+	const updateInfo = async () => {
+		let { key, iv } = await getCurrentKeyAndIv(
+			localStorage.getItem('key'),
+			localStorage.getItem('iv')
+		);
+		let newInfo = await encryptInfo(key, iv, changedProfile);
 
-	const checkDob = () => {
-		dobChanged = profile.dob === changedProfile.dob ? false : true;
-	};
+		console.log({ newInfo });
 
-	const checkHeight = () => {
-		heightChanged = profile.height === changedProfile.height ? false : true;
-	};
-
-	const checkWeight = () => {
-		weightChanged = profile.weight === changedProfile.weight ? false : true;
-	};
-
-	const checkAllergy = () => {
-		allergyChanged =
-			profile.allergy.sort().toString() === changedProfile.allergy.sort().toString() ? false : true;
-	};
-
-	const checkAlcohol = (event) => {
-		changedProfile.alcohol = event.target.checked;
-		alcoholChanged = profile.alcohol === changedProfile.alcohol ? false : true;
-	};
-
-	const checkSmoke = (event) => {
-		changedProfile.smoke = event.target.checked;
-		smokeChanged = profile.smoke === changedProfile.smoke ? false : true;
-	};
-
-	const checkCannabis = (event) => {
-		changedProfile.cannabis = event.target.checked;
-		cannabisChanged = profile.cannabis === changedProfile.cannabis ? false : true;
-	};
-
-	const updatePhysics = async () => {
 		try {
-			const tx = await $patientContract.setPhysique([
-				changedProfile.height,
-				Math.ceil(changedProfile.weight * 100)
-			]);
-			const receipt = await tx.wait();
+			let tx = await $patientContract.updateInfo(newInfo);
+			let receipt = await tx.wait();
 			window.location.reload();
 		} catch (error) {
 			console.log(error);
 		}
 	};
 
-	const updateHabits = async () => {
+	const approveUpdate = async (index) => {
 		try {
-			const tx = await $patientContract.setHabits([
-				changedProfile.alcohol,
-				changedProfile.smoke,
-				changedProfile.cannabis
-			]);
-			const receipt = await tx.wait();
+			let tx = await $patientContract.approveUpdate(index);
+			let receipt = await tx.wait();
+			window.location.reload();
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	const removeUpdate = async (index) => {
+		try {
+			let tx = await $patientContract.removeUpdate(index);
+			let receipt = await tx.wait();
 			window.location.reload();
 		} catch (error) {
 			console.log(error);
@@ -274,14 +316,29 @@
 </script>
 
 <div class="flex flex-col">
+	<div class="flex justify-between items-center mb-3">
+		<h1 class="text-2xl text-black font-bold">Patient Profile</h1>
+		<button
+			class="bg-black hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+			on:click={() => (qrShowed = true)}>Show QRcode</button
+		>
+	</div>
 	<div class="flex flex-col gap-2">
 		<div>
 			<div class="flex justify-between items-center">
 				<h2 class="text-xl text-black font-semibold">Info</h2>
-				<button
-					class="bg-black hover:bg-gray-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-					on:click={() => (qrShowed = true)}>Show QRcode</button
-				>
+				{#if infoChanged}
+					<button
+						class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+						on:click={updateInfo}>Save</button
+					>
+				{:else}
+					<button
+						class="invisible bg-gray-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+						type="button"
+						disabled>Save</button
+					>
+				{/if}
 			</div>
 			{#if qrShowed}
 				<div class="fixed z-10 inset-0 overflow-y-auto">
@@ -304,7 +361,9 @@
 						>
 							<div class="bg-white px-4 pt-5 pb-4">
 								<img
-									src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${profile.id}`}
+									src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data={"address":"${patientAddress}","key":[${localStorage.getItem(
+										'key'
+									)}]}`}
 									alt="QR Code"
 								/>
 							</div>
@@ -326,190 +385,59 @@
 				<div class="bg-white min-w-[50vw] mb-4">
 					<div class="mb-4">
 						<label for="" class="block text-gray-700 font-bold mb-2">Name</label>
-						<div class="flex gap-2">
-							<input
-								class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-								type="text"
-								bind:value={changedProfile.name}
-								on:input={checkName}
-							/>
-							{#if nameChanged}
-								<button
-									class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-									type="button"
-									on:click={async () => {
-										try {
-											await (
-												await $patientContract.setName(
-													utils.formatBytes32String(changedProfile.name)
-												)
-											).wait();
-											window.location.reload();
-										} catch (error) {}
-									}}>Save</button
-								>
-							{:else}
-								<button
-									class="invisible bg-gray-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-									type="button"
-									disabled>Save</button
-								>
-							{/if}
-						</div>
+						<input
+							class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+							type="text"
+							bind:value={changedProfile.name}
+							on:input={checkChange}
+						/>
 					</div>
 
 					<div class="mb-4">
 						<label for="" class="block text-gray-700 font-bold mb-2">Gender</label>
-						<div class="flex gap-2">
-							<select
-								class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-								bind:value={changedProfile.gender}
-								on:change={checkGender}
-							>
-								<option value="male">Male</option>
-								<option value="female">Female</option>
-								<option value="non-binary">Non-binary</option>
-							</select>
-							{#if genderChanged}
-								<button
-									class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-									type="button"
-									on:click={async () => {
-										console.log({
-											old: profile.gender,
-											new: changedProfile.gender
-										});
-										try {
-											const tx = await $patientContract.setGender(
-												utils.formatBytes32String(changedProfile.gender)
-											);
-											console.log(tx);
-
-											const receipt = await tx.wait();
-											console.log(receipt);
-
-											window.location.reload();
-										} catch (error) {
-											console.log(error);
-										}
-									}}>Save</button
-								>
-							{:else}
-								<button
-									class="invisible bg-gray-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-									type="button"
-									disabled>Save</button
-								>
-							{/if}
-						</div>
+						<select
+							class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+							bind:value={changedProfile.gender}
+							on:change={checkChange}
+						>
+							<option value="male">Male</option>
+							<option value="female">Female</option>
+							<option value="non-binary">Non-binary</option>
+						</select>
 					</div>
 
 					<div class="mb-4">
 						<label for="" class="block text-gray-700 font-bold mb-2">Date of birth</label>
-						<div class="flex gap-2">
-							<input
-								class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-								type="date"
-								bind:value={changedProfile.dob}
-								on:input={checkDob}
-							/>
-							{#if dobChanged}
-								<button
-									class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-									type="button"
-									on:click={async () => {
-										try {
-											await (
-												await $patientContract.setDob(new Date(changedProfile.dob).getTime() / 1000)
-											).wait();
-											window.location.reload();
-										} catch (error) {}
-									}}>Save</button
-								>
-							{:else}
-								<button
-									class="invisible bg-gray-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-									type="button"
-									disabled>Save</button
-								>
-							{/if}
-						</div>
+						<input
+							class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+							type="date"
+							bind:value={changedProfile.dob}
+							on:input={checkChange}
+						/>
 					</div>
 
 					<div class="mb-4">
 						<label for="" class="block text-gray-700 font-bold mb-2">Height (cm)</label>
-						<div class="flex gap-2">
-							<input
-								class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-								type="number"
-								bind:value={changedProfile.height}
-								on:input={checkHeight}
-							/>
-							{#if heightChanged}
-								<button
-									class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-									type="button"
-									on:click={updatePhysics}>Save</button
-								>
-							{:else}
-								<button
-									class="invisible bg-gray-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-									type="button"
-									disabled>Save</button
-								>
-							{/if}
-						</div>
+						<input
+							class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+							type="number"
+							bind:value={changedProfile.height}
+							on:input={checkChange}
+						/>
 					</div>
 
 					<div class="mb-4">
 						<label for="" class="block text-gray-700 font-bold mb-2">Weight (kg)</label>
-						<div class="flex gap-2">
-							<input
-								class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-								type="number"
-								bind:value={changedProfile.weight}
-								on:input={checkWeight}
-							/>
-							{#if weightChanged}
-								<button
-									class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-									type="button"
-									on:click={updatePhysics}>Save</button
-								>
-							{:else}
-								<button
-									class="invisible bg-gray-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-									type="button"
-									disabled>Save</button
-								>
-							{/if}
-						</div>
+						<input
+							class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+							type="number"
+							bind:value={changedProfile.weight}
+							on:input={checkChange}
+						/>
 					</div>
 
 					<div>
-						<div class="flex gap-2 justify-between items-start">
-							<label for="" class="block text-gray-700 font-bold">Allergy</label>
-							{#if allergyChanged}
-								<button
-									class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-									type="button"
-									on:click={async () => {
-										try {
-											await (await $patientContract.setAllergy(changedProfile.allergy)).wait();
-											window.location.reload();
-										} catch (error) {
-											console.log(error);
-										}
-									}}>Save</button
-								>
-							{:else}
-								<button
-									class="invisible bg-gray-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-									type="button"
-									disabled>Save</button
-								>
-							{/if}
-						</div>
+						<label for="" class="block text-gray-700 font-bold">Allergy</label>
 						<div class="mb-2 flex flex-col">
 							{#each tempAllergy as allergen}
 								<label>
@@ -518,7 +446,7 @@
 										type="checkbox"
 										bind:group={changedProfile.allergy}
 										value={allergen}
-										on:change={checkAllergy}
+										on:change={checkChange}
 									/>
 									{allergen}
 								</label>
@@ -538,8 +466,6 @@
 							</button>
 
 							{#if expanded}
-								<!-- content here -->
-
 								<label class="block text-gray-700 font-bold mb-2" for="food">Food</label>
 								<div class="mb-2 flex flex-col">
 									{#each foodAllergy.filter((value) => {
@@ -551,7 +477,7 @@
 												type="checkbox"
 												bind:group={changedProfile.allergy}
 												value={allergen}
-												on:change={checkAllergy}
+												on:change={checkChange}
 											/>
 											{allergen}
 										</label>
@@ -568,7 +494,7 @@
 												type="checkbox"
 												bind:group={changedProfile.allergy}
 												value={allergen}
-												on:change={checkAllergy}
+												on:change={checkChange}
 											/>
 											{allergen}
 										</label>
@@ -579,91 +505,90 @@
 					</div>
 
 					<label for="habits" class="block text-gray-700 font-bold">Habits</label>
-					<div class="mb-4">
-						<div class="flex gap-2 justify-between items-center">
-							<label for="alcohol">
-								<input
-									class="form-checkbox"
-									type="checkbox"
-									bind:checked={changedProfile.alcohol}
-									on:change={checkAlcohol}
-								/> Drink alcohol
-							</label>
-
-							{#if alcoholChanged}
-								<button
-									class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-									type="button"
-									on:click={updateHabits}>Save</button
-								>
-							{:else}
-								<button
-									class="invisible bg-gray-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-									type="button"
-									disabled>Save</button
-								>
-							{/if}
-						</div>
+					<div>
+						<label for="alcohol">
+							<input
+								class="form-checkbox"
+								type="checkbox"
+								bind:checked={changedProfile.alcohol}
+								on:change={checkChange}
+							/> Drink alcohol
+						</label>
 					</div>
-
-					<div class="mb-4">
-						<div class="flex gap-2 justify-between items-center">
-							<label for="">
-								<input type="checkbox" bind:checked={changedProfile.smoke} on:change={checkSmoke} />
-								Smoke cigarette
-							</label>
-
-							{#if smokeChanged}
-								<button
-									class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-									type="button"
-									on:click={updateHabits}>Save</button
-								>
-							{:else}
-								<button
-									class="invisible bg-gray-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-									type="button"
-									disabled>Save</button
-								>
-							{/if}
-						</div>
+					<div>
+						<label for="smoke">
+							<input type="checkbox" bind:checked={changedProfile.smoke} on:change={checkChange} />
+							Smoke cigarette
+						</label>
 					</div>
-
-					<div class="mb-4">
-						<div class="flex gap-2 justify-between items-center">
-							<label for="">
-								<input
-									type="checkbox"
-									bind:checked={changedProfile.cannabis}
-									on:change={checkCannabis}
-								/>
-								Use cannabis
-							</label>
-
-							{#if cannabisChanged}
-								<button
-									class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-									type="button"
-									on:click={updateHabits}>Save</button
-								>
-							{:else}
-								<button
-									class="invisible bg-gray-500 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-									type="button"
-									disabled>Save</button
-								>
-							{/if}
-						</div>
+					<div>
+						<label for="weed">
+							<input
+								type="checkbox"
+								bind:checked={changedProfile.cannabis}
+								on:change={checkChange}
+							/>
+							Use cannabis
+						</label>
 					</div>
 				</div>
+				{#each Object.keys(changedProfile).filter((value) => !basicInfo.includes(value)) as key}
+					<div class="mb-4">
+						<label for="" class="block text-gray-700 font-bold mb-2"
+							>{key.replace(/^\w/, (c) => c.toUpperCase())}</label
+						>
+						<input
+							class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+							type="number"
+							bind:value={changedProfile[key]}
+							on:input={checkChange}
+						/>
+					</div>
+				{/each}
+			{/if}
+		</div>
+		<div class="mb-3">
+			<h2 class="text-xl text-black font-semibold">Updates</h2>
+			{#if profile && profileUpdates}
+				{#if profileUpdates.length}
+					{#each profileUpdates as update, i}
+						<div class="mt-3">
+							{#if update !== 'Error decrypting'}
+								<!-- content here -->
+
+								<button
+									class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+									on:click|preventDefault={() => {
+										approveUpdate(i);
+									}}>Accept</button
+								>
+							{/if}
+							<button
+								class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+								on:click|preventDefault={() => {
+									removeUpdate(i);
+								}}>Discard</button
+							>
+							<div class="mt-3">
+								<pre>{JSON.stringify(update, undefined, 2)
+										.replaceAll('"', '')
+										.replace(/\{\n/, '')
+										.replace(/\}/, '')}</pre>
+							</div>
+							<hr />
+						</div>
+					{/each}
+				{:else}
+					<h3>No updates at the moment</h3>
+				{/if}
 			{/if}
 		</div>
 		<div class="mb-3">
 			<h2 class="text-xl text-black font-semibold">Access requests</h2>
 			{#if profile}
 				<div class="overflow-auto h-md">
-					{#if profile.requests.length}
-						{#each profile.requests as doctor}
+					{#if requests.length}
+						{#each requests as doctor}
 							<div class="flex justify-between items-center">
 								<h4>{doctor.name} / {doctor.affiliate}</h4>
 								<button
@@ -684,9 +609,9 @@
 			<h2 class="text-xl text-black font-semibold mb-2">Access Management</h2>
 			{#if profile}
 				<div class="overflow-auto h-md">
-					{#if profile.appQueue}
+					{#if applicationQueue}
 						<label for="" class="block text-gray-700 font-bold mb-2">Applications</label>
-						{#each profile.appQueue as application}
+						{#each applicationQueue as application}
 							<div class="flex justify-between items-center">
 								<h4>
 									{application.name} / {application.address.substring(
@@ -714,9 +639,9 @@
 					{/if}
 				</div>
 				<div class="overflow-auto h-md">
-					{#if profile.docQueue}
+					{#if doctorQueue}
 						<label for="" class="block text-gray-700 font-bold mb-2">Doctor</label>
-						{#each profile.docQueue as doctor}
+						{#each doctorQueue as doctor}
 							<div class="flex justify-between items-center">
 								<h4>{doctor.name} / {doctor.affiliate}</h4>
 								<button

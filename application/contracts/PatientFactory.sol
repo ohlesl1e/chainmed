@@ -15,36 +15,9 @@ contract PatientFactory is Ownable {
 
     function createPatient(
         address owner_,
-        Bytes32Pair memory nameGender_,
-        uint256 dob_,
-        SmallUintPair memory physique_,
-        string[] memory allergy_,
-        BoolTriple memory habits_,
-        FromAppOption memory option_
+        string memory info_
     ) external onlyOwner returns (address clone) {
         clone = Clones.clone(patientImplementation);
-        if (option_.fromApp) {
-            Patient(clone).initialize(
-                msg.sender,
-                owner_,
-                option_.addr,
-                nameGender_,
-                dob_,
-                physique_,
-                allergy_,
-                habits_
-            );
-        } else {
-            Patient(clone).initialize(
-                msg.sender,
-                owner_,
-                address(0),
-                nameGender_,
-                dob_,
-                physique_,
-                allergy_,
-                habits_
-            );
-        }
+        Patient(clone).initialize(msg.sender, owner_, info_);
     }
 }

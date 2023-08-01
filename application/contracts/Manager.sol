@@ -32,41 +32,16 @@ contract Manager is AccessControl {
     function addDoctor(
         address owner_,
         bytes32 name_,
-        bytes32 affiliate_,
-        bool fromApp_
+        bytes32 affiliate_
     ) public {
-        require(
-            hasRole(ADMINISTRATOR_ROLE, msg.sender) ||
-                hasRole(APPLICATION_ROLE, msg.sender),
-            "Access denied"
-        );
+        require(hasRole(ADMINISTRATOR_ROLE, msg.sender), "Access denied");
         require(doctors[owner_] == address(0), "Profile existed");
-        doctors[owner_] = doctorFactory.createDoctor(
-            owner_,
-            name_,
-            affiliate_,
-            FromAppOption(fromApp_, msg.sender)
-        );
+        doctors[owner_] = doctorFactory.createDoctor(owner_, name_, affiliate_);
     }
 
-    function addPatient(
-        Bytes32Pair memory nameGender_,
-        uint256 dob_,
-        SmallUintPair memory physique_,
-        string[] memory allergy_,
-        BoolTriple memory habits_,
-        FromAppOption memory option_
-    ) external {
-        require(patients[option_.addr] == address(0), "Profile existed");
-        patients[option_.addr] = patientFactory.createPatient(
-            option_.addr,
-            nameGender_,
-            dob_,
-            physique_,
-            allergy_,
-            habits_,
-            FromAppOption(option_.fromApp, msg.sender)
-        );
+    function addPatient(string memory info_) external {
+        require(patients[msg.sender] == address(0), "Profile existed");
+        patients[msg.sender] = patientFactory.createPatient(msg.sender, info_);
     }
 
     function doctorRequest(address patient_) external {
@@ -92,11 +67,5 @@ contract Manager is AccessControl {
                 docInfo[i] = DoctorStruct(name, affiliate);
             }
         }
-    }
-
-    function applicationRequest(address patient_) external {
-        require(patients[patient_] != address(0), "Patient is not a user");
-        Patient patient = Patient(patients[patient_]);
-        patient.appRequestAccess(msg.sender);
     }
 }

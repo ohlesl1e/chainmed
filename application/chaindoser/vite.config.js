@@ -18,10 +18,10 @@ const config = {
 	server: {
 		port: 4000,
 		host: true,
-		https: {
-			key: fs.readFileSync('./.cert/cert-key.pem'),
-			cert: fs.readFileSync('./.cert/cert.pem'),
-		},
+		// https: {
+		// 	key: fs.readFileSync('./.cert/cert-key.pem'),
+		// 	cert: fs.readFileSync('./.cert/cert.pem'),
+		// },
 		cors: {
 			origin: ['*://10.0.0.202:8545/', 'https://*.lhackerman.duckdns.org/', 'https://manager.lhackerman.duckdns.org/']
 		}
