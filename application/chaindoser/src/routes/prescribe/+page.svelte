@@ -13,6 +13,8 @@
     import { Html5QrcodeScanner } from "html5-qrcode";
     import { isAddress } from "ethers/lib/utils";
     import { DoubleBounce } from "svelte-loading-spinners";
+    import { sha256 } from "js-sha256";
+    import { getCurrentKeyAndIv } from "$lib/crypto";
     // import Scanner from "qrcode-scanner-svelte";
 
     let html5QrcodeScanner;
@@ -81,20 +83,35 @@
         html5QrcodeScanner.render(onScanSuccess, onScanFailure);
     });
 
+    const savePatientKey = (address, key) => {
+        const patientKeys = localStorage.getItem("patientKeys");
+        if (patientKeys) {
+            const vault = JSON.parse(patientKeys);
+            vault[address] = key;
+            localStorage.setItem("patientKeys", JSON.stringify(vault));
+        } else {
+            const vault = {};
+            vault[address] = key;
+            localStorage.setItem("patientKeys", JSON.stringify(vault));
+        }
+    };
+
     const onScanSuccess = async (decodedText, decodedResult) => {
         // handle the scanned code as you like, for example:
-        console.log(`Code matched = ${decodedText}`, isAddress(decodedText));
+        const { address, key } = JSON.parse(decodedText);
+        console.log(`Code matched = ${decodedText}`, isAddress(address));
 
-        if (isAddress(decodedText)) {
+        if (isAddress(address)) {
             // const provider = new ethers.providers.BaseProvider()
-            const code = await $provider.getCode(decodedText);
+            const code = await $provider.getCode(address);
             console.log({ code });
             if (code === "0x") {
-                patient = decodedText;
+                patient = address;
+                savePatientKey(patient, key);
                 searchPatient();
             } else {
                 const contract = new Contract(
-                    decodedText,
+                    address,
                     Patient.abi,
                     $provider.getSigner()
                 );
@@ -102,7 +119,8 @@
                     const role = await contract.PATIENT_ROLE();
                     patient = await contract.getRoleMember(role, 0);
                     console.log({ role, patient });
-                    getPatientInfo(decodedText);
+                    savePatientKey(patient, key);
+                    getPatientInfo(address);
                 } catch (error) {
                     console.log(error);
                     alert("Not a wallet or patient contract");
@@ -136,35 +154,74 @@
 
     const getPatientInfo = async (patientAddress) => {
         try {
+            let vault = localStorage.getItem("patientKeys");
+            let key;
+            let hash = sha256.update(patient);
+            let iv = new Uint32Array(hash.arrayBuffer());
+            if (vault) {
+                const keyArray = new Uint32Array(JSON.parse(vault)[patient]);
+                console.log({ keyArray });
+                key = await crypto.subtle.importKey(
+                    "raw",
+                    keyArray,
+                    "AES-GCM",
+                    true,
+                    ["encrypt", "decrypt"]
+                );
+            } else {
+                alert("Need valid key");
+            }
+            console.log({ patient, key, iv });
             let patientContract = new ethers.Contract(
                 patientAddress,
                 Patient.abi,
                 $provider.getSigner()
             );
             const res = await patientContract.getInfo();
-            // patient = await patientContract.getPatient();
-            console.log(res);
+            const raw = new Uint8Array(res.split(","));
+            console.log({ raw, res });
+            let decrypted;
+            try {
+                decrypted = await crypto.subtle.decrypt(
+                    { name: "AES-GCM", iv },
+                    key,
+                    raw.buffer
+                );
+                console.log({ decrypted });
+            } catch (error) {
+                console.error(error);
+                alert("Invalid key");
+                window.location.reload();
+            }
+            let dec = new TextDecoder();
+            let {
+                alcohol,
+                allergy,
+                cannabis,
+                dob,
+                gender,
+                height,
+                name,
+                smoke,
+                weight,
+            } = JSON.parse(dec.decode(decrypted));
             // const treatments = res[9];
             info = {
-                name: ethers.utils.parseBytes32String(res[0][0]),
-                gender: ethers.utils.parseBytes32String(res[0][1]),
-                age:
-                    new Date().getFullYear() -
-                    new Date(
-                        ethers.BigNumber.from(res[1]).toNumber() * 1000
-                    ).getFullYear(),
-                height: res[2][0],
-                weight: res[2][1] / 100,
-                allergy: res[3],
-                alcohol: res[4][0],
-                smoke: res[4][1],
-                cannabis: res[4][2],
+                name,
+                gender,
+                age: new Date().getFullYear() - new Date(dob).getFullYear(),
+                height,
+                weight,
+                allergy,
+                alcohol,
+                smoke,
+                cannabis,
                 treatment: [],
             };
 
             // console.log(treatments);
-
-            for (const treatment of res[5]) {
+            const treatments = await patientContract.getTreatments();
+            for (const treatment of treatments) {
                 const treatmentContract = new Contract(
                     treatment,
                     Treatment.abi,

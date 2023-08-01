@@ -6,15 +6,23 @@
 	"output": {
 		"abi": [
 			{
+				"anonymous": false,
 				"inputs": [
 					{
+						"indexed": true,
 						"internalType": "address",
-						"name": "manager_",
+						"name": "sender",
 						"type": "address"
+					},
+					{
+						"indexed": false,
+						"internalType": "bytes",
+						"name": "result",
+						"type": "bytes"
 					}
 				],
-				"stateMutability": "nonpayable",
-				"type": "constructor"
+				"name": "doctorAdded",
+				"type": "event"
 			},
 			{
 				"inputs": [
@@ -40,154 +48,16 @@
 				"type": "function"
 			},
 			{
-				"inputs": [
-					{
-						"components": [
-							{
-								"internalType": "bytes32",
-								"name": "value1",
-								"type": "bytes32"
-							},
-							{
-								"internalType": "bytes32",
-								"name": "value2",
-								"type": "bytes32"
-							}
-						],
-						"internalType": "struct Bytes32Pair",
-						"name": "nameGender_",
-						"type": "tuple"
-					},
-					{
-						"internalType": "uint256",
-						"name": "dob_",
-						"type": "uint256"
-					},
-					{
-						"components": [
-							{
-								"internalType": "uint16",
-								"name": "value1",
-								"type": "uint16"
-							},
-							{
-								"internalType": "uint16",
-								"name": "value2",
-								"type": "uint16"
-							}
-						],
-						"internalType": "struct SmallUintPair",
-						"name": "physique_",
-						"type": "tuple"
-					},
-					{
-						"internalType": "string[]",
-						"name": "allergy_",
-						"type": "string[]"
-					},
-					{
-						"components": [
-							{
-								"internalType": "bool",
-								"name": "value1",
-								"type": "bool"
-							},
-							{
-								"internalType": "bool",
-								"name": "value2",
-								"type": "bool"
-							},
-							{
-								"internalType": "bool",
-								"name": "value3",
-								"type": "bool"
-							}
-						],
-						"internalType": "struct BoolTriple",
-						"name": "habits_",
-						"type": "tuple"
-					}
-				],
-				"name": "addPatient",
-				"outputs": [],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "patient_",
-						"type": "address"
-					},
-					{
-						"internalType": "string",
-						"name": "medicine_",
-						"type": "string"
-					},
+				"inputs": [],
+				"name": "getName",
+				"outputs": [
 					{
 						"internalType": "bytes32",
-						"name": "form_",
+						"name": "name_",
 						"type": "bytes32"
-					},
-					{
-						"components": [
-							{
-								"internalType": "uint16",
-								"name": "strength",
-								"type": "uint16"
-							},
-							{
-								"internalType": "bytes32",
-								"name": "unit",
-								"type": "bytes32"
-							}
-						],
-						"internalType": "struct Dosage",
-						"name": "dosage_",
-						"type": "tuple"
-					},
-					{
-						"components": [
-							{
-								"internalType": "uint256",
-								"name": "startDate",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "endDate",
-								"type": "uint256"
-							},
-							{
-								"internalType": "enum Frequency",
-								"name": "frequency",
-								"type": "uint8"
-							},
-							{
-								"internalType": "uint8",
-								"name": "interval",
-								"type": "uint8"
-							},
-							{
-								"internalType": "bytes32[]",
-								"name": "daysOfWeek",
-								"type": "bytes32[]"
-							},
-							{
-								"internalType": "uint16[]",
-								"name": "timesOfDay",
-								"type": "uint16[]"
-							}
-						],
-						"internalType": "struct Schedule",
-						"name": "schedule_",
-						"type": "tuple"
 					}
 				],
-				"name": "prescribe",
-				"outputs": [],
-				"stateMutability": "nonpayable",
+				"stateMutability": "view",
 				"type": "function"
 			}
 		],
@@ -307,27 +177,27 @@
 			]
 		},
 		"contracts/Application.sol": {
-			"keccak256": "0x30336f6b6b48252da28cab55cb441f189872ec8a92ae761214cad11cfb188e06",
+			"keccak256": "0x61d3b035ac9c8692a3b5dbfcfd82ec36ec37e6dba034f6ff59e4458c0441c925",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://15694544adcf723b53c0fcfc2bf99a6475dbf1f2f0ce74fb02be6f22eb0e54c9",
-				"dweb:/ipfs/QmPGBmPbewswNco4ps8yRGWo85nS7mmEc2cen5c5F8FrKL"
+				"bzz-raw://d142204268e908654e651c44520b62ffb49b2c3149eec8a994ab6d2d39ea2a70",
+				"dweb:/ipfs/QmVNEFzaeqw1BFtKpAKenhpS8QfsK59qg6mVWAd5jG4Gh5"
 			]
 		},
 		"contracts/Doctor.sol": {
-			"keccak256": "0xb1cdfbfa349b9f4ace4790ea9f178c1d9439a472a2e06acead03ec670fdb1f99",
+			"keccak256": "0x030cf77b48e95326bac6bc6e074c7646f6024e101d8dd43a40ef2588d0e56449",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://59b3d941f3ca13e923f48c6cb8625dd05e8b69650544d685772fba66a941b7cd",
-				"dweb:/ipfs/QmWzq1qbJ1sCPDTUu7beHgmZNLKpyksiorui5kYwdW9oBs"
+				"bzz-raw://14ccf3fe5c3c94a9f429bc3ae1488898a52f790d0af4ce0cb325185db4d29781",
+				"dweb:/ipfs/QmaFJdiSXq4MG6myuNk7nN985dfpmJUi29vwNasriDSoG2"
 			]
 		},
 		"contracts/DoctorFactory.sol": {
-			"keccak256": "0xd72b17137bf3518f793626cf75c7b36717e234902e8b8532aa5e28e15e776c8f",
+			"keccak256": "0x177bb99e34974e2fded1b071106ac06fad50d8b260941dad060e2b78efe17931",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://15802176e887309106b348373fcc1aa241079951979846882fdd9bf3ba75fd5a",
-				"dweb:/ipfs/QmPupCYx43TguXbjan2DpGyJyotVQ5rdjPeexYXKWTwHX2"
+				"bzz-raw://89f7072ab9b543c194c97b0158dd24ee69a89179195d21c294a223fac34c69ed",
+				"dweb:/ipfs/QmRhKz2Brp56aFkHAB5Ef4NwwTsWvrvTpeYN4HJdNCFqfC"
 			]
 		},
 		"contracts/Helper.sol": {
@@ -339,27 +209,27 @@
 			]
 		},
 		"contracts/Manager.sol": {
-			"keccak256": "0x57db1553d068332b369fe425db28db5ccccc33121e5efbcd5f5c72dd939bab8a",
+			"keccak256": "0x7bd43ca404f8be7b4c9b2c6fc1371fad414e1ad4e91c3b215c045332888129a7",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://1a388af489abd2c9eb44d43df20dc0654ff833dd15707f70abda71ee986a222f",
-				"dweb:/ipfs/QmTzzshDVvPNijhdVChmBRN5qJePuEM7fw2X2SB2wNUvgU"
+				"bzz-raw://ebe785b9ffcfe63ff06fcbd9691f9b7c3fd92d283a0bfa26cbb846873fd01f6a",
+				"dweb:/ipfs/QmR1cYJ8zob2Uc1unHePP6DbLb12SWfMLvrCqDhgTBQ7CV"
 			]
 		},
 		"contracts/Patient.sol": {
-			"keccak256": "0x0268faf25bcb8e1c2becfa08d34ae77a18e27cce567223df7050e2f79b7104ee",
+			"keccak256": "0x04e86b6821fd4da3c15a1b3a9d7fb8fa4dceca38d4b7f592a657d77c24c088c3",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://0927beab6019b17e76f17d47a8790a4b9349b3c3ce62ca870bd02621826b07a1",
-				"dweb:/ipfs/QmeyXF4sMSkGHcJg8a4qsPA8CdjRSTzxLrQo9viyYsuXxD"
+				"bzz-raw://f130dd9febb60ba355f1b85f4a8cd71c6de726fb11bf01553df40ee41ea16cd4",
+				"dweb:/ipfs/QmcuyFae2or9nXLeekENjJoHNAbv9BQvjjLev1yhfhhckG"
 			]
 		},
 		"contracts/PatientFactory.sol": {
-			"keccak256": "0x248049c4ab86f18c03e4f75f1f424cc3e6d0ab49247ae2fbea22e389bce71cec",
+			"keccak256": "0x7cad4ebe6c541e4c9b61f9b3b97782cf6b7d4dbeadad15a5cf782a0d0e821265",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://227daa4fdb3bbfa342dc1c7b7b788666ec896102b3722268637ab2b06ad803bb",
-				"dweb:/ipfs/QmPJ3UHzindBH23ARbU5pLJxrmAsYFknZGAXquCj22QiRG"
+				"bzz-raw://90b56abcde5b2f000b76714b744c945d2be53c7d1009d89e3000ee023df5e80e",
+				"dweb:/ipfs/QmWVvHiLaLVbbLR7VgV7Ap42WFJppdJvZEpcvn9qyVeaUq"
 			]
 		},
 		"contracts/Treatment.sol": {

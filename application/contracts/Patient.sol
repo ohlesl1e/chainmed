@@ -12,19 +12,11 @@ contract Patient is AccessControlEnumerable {
     bytes32 public constant DOCTOR_ROLE = keccak256("DOCTOR_ROLE");
 
     string private info;
-    bytes32 private name;
-    bytes32 private gender;
-    uint256 private dob;
-    uint16 private height;
-    uint16 private weight;
-    bool private alcohol;
-    bool private smoke;
-    bool private cannabis;
     bool private init;
-    string[] private allergy;
     address[] private treatments;
     address[] private requests;
     mapping(address => bool) private doctorQueue;
+    string[] private updates;
 
     constructor() {
         _setRoleAdmin(PATIENT_ROLE, DEFAULT_ADMIN_ROLE);
@@ -47,6 +39,8 @@ contract Patient is AccessControlEnumerable {
         isPatient();
         _;
     }
+
+    event updateRemoved(address indexed sender, bytes result);
 
     function hasReadAccess() public view {
         require(
@@ -77,12 +71,6 @@ contract Patient is AccessControlEnumerable {
     function initialize(
         address manager_,
         address owner_,
-        address app_,
-        // Bytes32Pair memory nameGender_,
-        // uint256 dob_,
-        // SmallUintPair memory physique_,
-        // string[] memory allergy_,
-        // BoolTriple memory alcoholSmokeCannabis_,
         string memory info_
     ) external {
         require(init == false, "Already initialized");
@@ -93,60 +81,59 @@ contract Patient is AccessControlEnumerable {
         _setupRole(DEFAULT_ADMIN_ROLE, owner_);
         _setupRole(PATIENT_ROLE, owner_);
         _setupRole(MANAGER_ROLE, manager_);
-        if (app_ != address(0)) _setupRole(APPLICATION_ROLE, app_);
-        // name = nameGender_.value1;
-        // gender = nameGender_.value2;
-        // dob = dob_;
-        // height = physique_.value1;
-        // weight = physique_.value2;
-        // allergy = allergy_;
-        // alcohol = alcoholSmokeCannabis_.value1;
-        // smoke = alcoholSmokeCannabis_.value2;
-        // cannabis = alcoholSmokeCannabis_.value3;
         info = info_;
         init = true;
     }
 
-    function getInfo()
-        external
-        view
-        canRead
-        returns (address[] memory, address[] memory, string memory)
-    {
-        address[] memory treatments_ = new address[](treatments.length);
-        for (uint256 index = 0; index < treatments_.length; index++) {
-            treatments_[index] = treatments[index];
-        }
-
-        return (treatments_, requests, info);
+    function getInfo() external view canRead returns (string memory) {
+        return info;
     }
 
-    // function setName(bytes32 name_) external onlyPatient {
-    //     name = name_;
-    // }
+    function getRequests()
+        external
+        view
+        onlyPatient
+        returns (address[] memory)
+    {
+        return requests;
+    }
 
-    // function setGender(bytes32 gender_) external onlyPatient {
-    //     gender = gender_;
-    // }
+    function getTreatments() external view canRead returns (address[] memory) {
+        return treatments;
+    }
 
-    // function setDob(uint256 dob_) external onlyPatient {
-    //     dob = dob_;
-    // }
+    function getUpdates() external view canRead returns (string[] memory) {
+        return updates;
+    }
 
-    // function setPhysique(SmallUintPair memory physique_) external canWrite {
-    //     height = physique_.value1;
-    //     weight = physique_.value2;
-    // }
+    function addUpdate(string memory newInfo) external canWrite {
+        updates.push(newInfo);
+    }
 
-    // function setAllergy(string[] memory allergy_) external canWrite {
-    //     allergy = allergy_;
-    // }
+    function approveUpdate(uint256 index) external onlyPatient {
+        require(index < updates.length, "index out of bound");
 
-    // function setHabits(BoolTriple memory habits_) external canWrite {
-    //     alcohol = habits_.value1;
-    //     smoke = habits_.value2;
-    //     cannabis = habits_.value3;
-    // }
+        info = updates[index]; //update the current value
+
+        //remove the updates
+        (bool success, bytes memory result) = address(this).delegatecall(
+            abi.encodeWithSignature("removeUpdate(uint256)", index)
+        );
+        require(success, "Delegate call failed");
+
+        emit updateRemoved(msg.sender, result);
+    }
+
+    function removeUpdate(uint256 index) public onlyPatient {
+        for (uint i = index; i < updates.length - 1; i++) {
+            updates[i] = updates[i + 1];
+        }
+        updates.pop();
+    }
+
+    function updateInfo(string memory info_) external onlyPatient {
+        info = info_;
+    }
 
     function addTreatment(
         address treatment_
@@ -184,15 +171,6 @@ contract Patient is AccessControlEnumerable {
         require(!doctorQueue[doctor_], "You already requested access");
         requests.push(doctor_);
         doctorQueue[doctor_] = true;
-    }
-
-    function getRequestQueue()
-        external
-        view
-        onlyPatient
-        returns (address[] memory queue)
-    {
-        queue = requests;
     }
 
     function acceptRequest(address doctor_) external onlyPatient {

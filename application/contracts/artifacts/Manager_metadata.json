@@ -140,11 +140,6 @@
 						"internalType": "bytes32",
 						"name": "affiliate_",
 						"type": "bytes32"
-					},
-					{
-						"internalType": "bool",
-						"name": "fromApp_",
-						"type": "bool"
 					}
 				],
 				"name": "addDoctor",
@@ -154,89 +149,6 @@
 			},
 			{
 				"inputs": [
-					{
-						"components": [
-							{
-								"internalType": "bytes32",
-								"name": "value1",
-								"type": "bytes32"
-							},
-							{
-								"internalType": "bytes32",
-								"name": "value2",
-								"type": "bytes32"
-							}
-						],
-						"internalType": "struct Bytes32Pair",
-						"name": "nameGender_",
-						"type": "tuple"
-					},
-					{
-						"internalType": "uint256",
-						"name": "dob_",
-						"type": "uint256"
-					},
-					{
-						"components": [
-							{
-								"internalType": "uint16",
-								"name": "value1",
-								"type": "uint16"
-							},
-							{
-								"internalType": "uint16",
-								"name": "value2",
-								"type": "uint16"
-							}
-						],
-						"internalType": "struct SmallUintPair",
-						"name": "physique_",
-						"type": "tuple"
-					},
-					{
-						"internalType": "string[]",
-						"name": "allergy_",
-						"type": "string[]"
-					},
-					{
-						"components": [
-							{
-								"internalType": "bool",
-								"name": "value1",
-								"type": "bool"
-							},
-							{
-								"internalType": "bool",
-								"name": "value2",
-								"type": "bool"
-							},
-							{
-								"internalType": "bool",
-								"name": "value3",
-								"type": "bool"
-							}
-						],
-						"internalType": "struct BoolTriple",
-						"name": "habits_",
-						"type": "tuple"
-					},
-					{
-						"components": [
-							{
-								"internalType": "bool",
-								"name": "fromApp",
-								"type": "bool"
-							},
-							{
-								"internalType": "address",
-								"name": "addr",
-								"type": "address"
-							}
-						],
-						"internalType": "struct FromAppOption",
-						"name": "option_",
-						"type": "tuple"
-					},
 					{
 						"internalType": "string",
 						"name": "info_",
@@ -582,19 +494,19 @@
 			]
 		},
 		"contracts/Doctor.sol": {
-			"keccak256": "0xb1cdfbfa349b9f4ace4790ea9f178c1d9439a472a2e06acead03ec670fdb1f99",
+			"keccak256": "0x030cf77b48e95326bac6bc6e074c7646f6024e101d8dd43a40ef2588d0e56449",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://59b3d941f3ca13e923f48c6cb8625dd05e8b69650544d685772fba66a941b7cd",
-				"dweb:/ipfs/QmWzq1qbJ1sCPDTUu7beHgmZNLKpyksiorui5kYwdW9oBs"
+				"bzz-raw://14ccf3fe5c3c94a9f429bc3ae1488898a52f790d0af4ce0cb325185db4d29781",
+				"dweb:/ipfs/QmaFJdiSXq4MG6myuNk7nN985dfpmJUi29vwNasriDSoG2"
 			]
 		},
 		"contracts/DoctorFactory.sol": {
-			"keccak256": "0xd72b17137bf3518f793626cf75c7b36717e234902e8b8532aa5e28e15e776c8f",
+			"keccak256": "0x177bb99e34974e2fded1b071106ac06fad50d8b260941dad060e2b78efe17931",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://15802176e887309106b348373fcc1aa241079951979846882fdd9bf3ba75fd5a",
-				"dweb:/ipfs/QmPupCYx43TguXbjan2DpGyJyotVQ5rdjPeexYXKWTwHX2"
+				"bzz-raw://89f7072ab9b543c194c97b0158dd24ee69a89179195d21c294a223fac34c69ed",
+				"dweb:/ipfs/QmRhKz2Brp56aFkHAB5Ef4NwwTsWvrvTpeYN4HJdNCFqfC"
 			]
 		},
 		"contracts/Helper.sol": {
@@ -606,27 +518,27 @@
 			]
 		},
 		"contracts/Manager.sol": {
-			"keccak256": "0x19ec948ab8dd71da312ae5710f6cbb999160c64af00126eea568435a27794016",
+			"keccak256": "0xe51121b8e649d0a635f95b89c078c487a82a8f7a94d5c7fa1b9384736a3309d3",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://05ff27aef844c625c2113b490135bf9d25f2f6a26f2f4c2641a98e6116e29057",
-				"dweb:/ipfs/QmQ6fx1FxrhPsfBZfojXxKZeZUPmSTK3RUpfYiGYK67gC4"
+				"bzz-raw://73e4f27ff248e8871748cbfc528c87443f288482f6581df7f104699718bec960",
+				"dweb:/ipfs/QmcSxWNVYiSj14kW6tmcqrtym6aFSg2eZ6pFVYsBBYXVkT"
 			]
 		},
 		"contracts/Patient.sol": {
-			"keccak256": "0xddab08787cf6f6778b5b6f401fdee78e28a5d532ad6665f5cc3f14d058ee31b6",
+			"keccak256": "0x04e86b6821fd4da3c15a1b3a9d7fb8fa4dceca38d4b7f592a657d77c24c088c3",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://9366a7416622349ac2c09faa9f23af103c41d6d7e499dbeec880a0ff32fe6348",
-				"dweb:/ipfs/QmYMJMgxZvWuoaZPc73tAwZG1Y4nNJE4KDhwgVkNaASsAC"
+				"bzz-raw://f130dd9febb60ba355f1b85f4a8cd71c6de726fb11bf01553df40ee41ea16cd4",
+				"dweb:/ipfs/QmcuyFae2or9nXLeekENjJoHNAbv9BQvjjLev1yhfhhckG"
 			]
 		},
 		"contracts/PatientFactory.sol": {
-			"keccak256": "0xbe803bcdbe5f134f9fdadc60298a717941b0bba681c5d761c200f60306337f96",
+			"keccak256": "0x7cad4ebe6c541e4c9b61f9b3b97782cf6b7d4dbeadad15a5cf782a0d0e821265",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://e4ff79a38f20032be1a0a0bc2becf96f9c0d6b8f239912276acc00c0cf382dcf",
-				"dweb:/ipfs/QmcdHMxnMPM5vM7AL1wfYMGB16u6YieDoQz12aM7dEnFPn"
+				"bzz-raw://90b56abcde5b2f000b76714b744c945d2be53c7d1009d89e3000ee023df5e80e",
+				"dweb:/ipfs/QmWVvHiLaLVbbLR7VgV7Ap42WFJppdJvZEpcvn9qyVeaUq"
 			]
 		},
 		"contracts/Treatment.sol": {

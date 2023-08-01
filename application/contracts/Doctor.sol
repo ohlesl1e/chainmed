@@ -38,7 +38,6 @@ contract Doctor is AccessControl {
 
     function initialize(
         address owner_,
-        address app_,
         address manager_,
         bytes32 name_,
         bytes32 affiliate_
@@ -47,7 +46,6 @@ contract Doctor is AccessControl {
         _setupRole(DOCTOR_ROLE, owner_);
         _setupRole(MANAGER_ROLE, manager_);
         _setRoleAdmin(MANAGER_ROLE, DOCTOR_ROLE);
-        if (app_ != address(0)) _setupRole(MANAGER_ROLE, app_);
 
         name = name_;
         affiliate = affiliate_;

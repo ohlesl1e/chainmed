@@ -238,11 +238,6 @@
 					},
 					{
 						"internalType": "address",
-						"name": "app_",
-						"type": "address"
-					},
-					{
-						"internalType": "address",
 						"name": "manager_",
 						"type": "address"
 					},
@@ -429,11 +424,11 @@
 			]
 		},
 		"contracts/Doctor.sol": {
-			"keccak256": "0xb1cdfbfa349b9f4ace4790ea9f178c1d9439a472a2e06acead03ec670fdb1f99",
+			"keccak256": "0x030cf77b48e95326bac6bc6e074c7646f6024e101d8dd43a40ef2588d0e56449",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://59b3d941f3ca13e923f48c6cb8625dd05e8b69650544d685772fba66a941b7cd",
-				"dweb:/ipfs/QmWzq1qbJ1sCPDTUu7beHgmZNLKpyksiorui5kYwdW9oBs"
+				"bzz-raw://14ccf3fe5c3c94a9f429bc3ae1488898a52f790d0af4ce0cb325185db4d29781",
+				"dweb:/ipfs/QmaFJdiSXq4MG6myuNk7nN985dfpmJUi29vwNasriDSoG2"
 			]
 		},
 		"contracts/Treatment.sol": {

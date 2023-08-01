@@ -23,7 +23,7 @@ export const POST = async ({ request }) => {
                         message: "Login success",
                         token: jwt.sign(
                             { type, address: result },
-                            JWT_SECRET
+                            JWT_SECRET, { expiresIn: '1y' }
                         )
                     }))
                 }
@@ -36,7 +36,7 @@ export const POST = async ({ request }) => {
                         message: "Login success",
                         token: jwt.sign(
                             { type, address: result },
-                            JWT_SECRET
+                            JWT_SECRET, { expiresIn: '1y' }
                         )
                     }))
                 }

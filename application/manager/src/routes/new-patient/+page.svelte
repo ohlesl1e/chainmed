@@ -142,7 +142,7 @@
 				// [height, Math.ceil(weight * 100)],
 				// allergy,
 				// [alcohol, smoke, cannabis],
-				[false, await $provider.getSigner().getAddress()],
+				// [false, await $provider.getSigner().getAddress()],
 				new Uint8Array(encrypted).join()
 			);
 			const receipt = await tx.wait();
@@ -168,7 +168,10 @@
 			<div class="bg-white p-4 rounded-md max-w-sm text-center">
 				<h2 class="h2">Keep this key somewhere safe</h2>
 				<p>{key.join()}</p>
-				<button on:click={() => goto('/')}>Close</button>
+				<button
+					class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+					on:click={() => goto('/')}>Close</button
+				>
 			</div>
 		</div>
 	{/if}

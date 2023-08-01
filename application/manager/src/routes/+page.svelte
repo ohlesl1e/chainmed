@@ -160,7 +160,7 @@
 			<label for="" class="block text-gray-700 font-bold mb-2">Enter your key</label>
 			<div class="flex gap-2">
 				<input
-					class="shadow appearance-none border rounded w-[65ch] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+					class="shadow appearance-none border rounded max-w-[65ch] py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
 					type="password"
 					bind:value={key}
 				/>
@@ -173,7 +173,6 @@
 	{/if}
 	{#if patientAddress && patientAddress !== constants.AddressZero}
 		<section class="flex flex-col p-10 items-start gap-5 border-2 rounded-xl">
-			<h1 class="text-2xl text-black font-bold">Patient Profile</h1>
 			<PatientDash {patientAddress} />
 		</section>
 	{/if}

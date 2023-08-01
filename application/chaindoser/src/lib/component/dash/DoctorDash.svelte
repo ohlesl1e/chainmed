@@ -9,6 +9,8 @@
     import { ethers, utils, BigNumber } from "ethers";
     import { PUBLIC_PUSH_KEY } from "$env/static/public";
     import DoctorChart from "./DoctorChart.svelte";
+    import { sha256 } from "js-sha256";
+    import { getCurrentKeyAndIv, decryptInfo } from "$lib/crypto";
 
     let profileContract;
     let treatments = [],
@@ -32,6 +34,12 @@
             let tempTreatments = [];
             let tempPatients = [];
 
+            const patientKeys = localStorage.getItem("patientKeys");
+            let vault = {};
+            if (patientKeys) {
+                vault = JSON.parse(patientKeys);
+            }
+
             for (const treatment in res) {
                 const treatmentContract = new ethers.Contract(
                     res[treatment],
@@ -41,41 +49,63 @@
                 const treatmentData = await treatmentContract.getTreatment();
                 const patient = await treatmentContract.getPatient();
                 let patientProfile;
-                try {
-                    const profileAddress = await $managerContract.getPatient(
-                        patient
-                    );
-                    const patientContract = new ethers.Contract(
-                        profileAddress,
-                        Patient.abi,
-                        $provider.getSigner()
-                    );
-                    const info = await patientContract.getInfo();
-                    // console.log(info);
-                    patientProfile = {
-                        id: patient,
-                        name: utils.parseBytes32String(info[0][0]),
-                        gender: utils.parseBytes32String(info[0][1]),
-                        age:
-                            new Date().getFullYear() -
-                            new Date(
-                                BigNumber.from(info[1]).toNumber() * 1000
-                            ).getFullYear(),
-                        height: info[2][0],
-                        weight: info[2][1] / 100,
-                        allergy: info[3],
-                        alcohol: info[4][0],
-                        smoke: info[4][1],
-                        cannabis: info[4][2],
-                    };
+                if (!patientAddresses.has(patient)) {
+                    try {
+                        const profileAddress =
+                            await $managerContract.getPatient(patient);
+                        const patientContract = new ethers.Contract(
+                            profileAddress,
+                            Patient.abi,
+                            $provider.getSigner()
+                        );
+                        const { key, iv } = await getCurrentKeyAndIv(
+                            vault[patient].join(),
+                            new Uint32Array(
+                                sha256.update(patient).arrayBuffer()
+                            ).join()
+                        );
 
-                    if (!patientAddresses.has(patient)) {
+                        const info = await patientContract.getInfo();
+                        const raw = new Uint8Array(info.split(","));
+                        // console.log({ raw, key, iv });
+
+                        let {
+                            alcohol,
+                            allergy,
+                            cannabis,
+                            dob,
+                            gender,
+                            height,
+                            name,
+                            smoke,
+                            weight,
+                        } = await decryptInfo(raw, key, iv, patient, "doctor");
+
+                        patientProfile = {
+                            id: patient,
+                            name,
+                            gender,
+                            age:
+                                new Date().getFullYear() -
+                                new Date(dob).getFullYear(),
+                            height,
+                            weight,
+                            allergy,
+                            alcohol,
+                            smoke,
+                            cannabis,
+                        };
+                        // console.log(patientProfile);
                         tempPatients.push(patientProfile);
                         patientAddresses.add(patient);
+                    } catch (error) {
+                        console.error(error);
+                        console.log(`No access to ${patient}`);
                     }
-                } catch (error) {
-                    // console.log(error);
-                    console.log(`No access to ${patient}`);
+                } else {
+                    patientProfile = tempPatients.find(
+                        (value) => value.id === patient
+                    );
                 }
                 // console.log(treatmentData);
 
@@ -89,34 +119,6 @@
                         0,
                     patient: patientProfile.name,
                     medicine: treatmentData[0],
-                    // form: utils.parseBytes32String(treatmentData[1]),
-                    // dosage: {
-                    //     strength: treatmentData[2][0],
-                    //     unit: utils.parseBytes32String(treatmentData[2][1]),
-                    // },
-                    // schedule: {
-                    //     startDate: new Date(
-                    //         BigNumber.from(treatmentData[3][0]).toNumber()
-                    //     ).toLocaleDateString(),
-                    //     endDate: new Date(
-                    //         BigNumber.from(treatmentData[3][1]).toNumber()
-                    //     ).toLocaleDateString(),
-                    //     frequency: treatmentData[3][2],
-                    //     interval: treatmentData[3][3],
-                    //     daysOfWeek: treatmentData[3][4].map(
-                    //         (treatmentData) =>
-                    //             utils.parseBytes32String(treatmentData)
-                    //     ),
-                    //     timesOfDay: treatmentData[3][5].map(
-                    //         (treatmentData) => {
-                    //             return `${String(
-                    //                 Math.floor(treatmentData / 100)
-                    //             ).padStart(2, "0")}:${String(
-                    //                 treatmentData % 100
-                    //             ).padStart(2, "0")}`;
-                    //         }
-                    //     ),
-                    // },
                 });
             }
             treatments = tempTreatments;
@@ -207,27 +209,6 @@
                     {#if treatments.filter((value) => value.completed === false).length}
                         <!-- <form> -->
                         {#each treatments.filter((value) => value.completed === false) as item}
-                            <!-- <div class="mt-4">
-                                <div class="flex items-start text-lg">
-                                    <a
-                                        href={`/treatment/${item.id}`}
-                                        class="ml-3 font-medium"
-                                    >
-                                        {`...${item.id.substr(-4, 4)}`}
-                                    </a>
-                                </div>
-                                <p
-                                    class="mt-1 ml-4 pl-3 block text-md text-gray-200"
-                                >
-                                    Medicine:
-                                    {#if item.medicine}
-                                        {item.medicine}
-                                    {:else}
-                                        null
-                                    {/if}<br />
-                                    Patient: {item.patient}
-                                </p>
-                            </div> -->
                             <div class="mt-4">
                                 <div class="flex items-start text-lg">
                                     <a
@@ -258,7 +239,7 @@
             {/if}
         </div>
         <div>
-            <div class="flex justify-between items-center">
+            <div class="flex justify-between items-center gap-1">
                 <h2>Prescribe medicine</h2>
                 <button on:click={() => goto("/prescribe")}>Start</button>
             </div>
