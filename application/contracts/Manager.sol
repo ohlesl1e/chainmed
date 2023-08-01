@@ -53,19 +53,4 @@ contract Manager is AccessControl {
         Patient patient = Patient(patients[patient_]);
         patient.doctorRequestAccess(msg.sender);
     }
-
-    function getDoctorInfo(
-        address[] memory doctors_
-    ) external view returns (DoctorStruct[] memory docInfo) {
-        docInfo = new DoctorStruct[](doctors_.length);
-        for (uint256 i = 0; i < doctors_.length; i++) {
-            if (doctors[doctors_[i]] == address(0)) {
-                docInfo[i] = DoctorStruct(bytes32(0), bytes32(0));
-            } else {
-                (bytes32 name, bytes32 affiliate) = Doctor(doctors[doctors_[i]])
-                    .getInfo();
-                docInfo[i] = DoctorStruct(name, affiliate);
-            }
-        }
-    }
 }

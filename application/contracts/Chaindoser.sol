@@ -21,7 +21,7 @@ contract Chaindoser is Application {
             address(patient) != address(0) && address(doctor) != address(0),
             "Patient or doctor in not a user"
         );
-        require(patient.checkDoctor(msg.sender), "User does not have DOCTOR_ROLE to prescribe");
+        require(patient.hasRole(patient.DOCTOR_ROLE(), msg.sender), "User does not have DOCTOR_ROLE to prescribe");
 
         address newTreatment = treatmentFactory.createTreatment(
             msg.sender,
