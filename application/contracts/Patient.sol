@@ -64,10 +64,6 @@ contract Patient is AccessControlEnumerable {
         require(hasRole(PATIENT_ROLE, msg.sender), "Not patient");
     }
 
-    function checkDoctor(address user_) external view canWrite returns (bool) {
-        return hasRole(DOCTOR_ROLE, user_);
-    }
-
     function initialize(
         address manager_,
         address owner_,

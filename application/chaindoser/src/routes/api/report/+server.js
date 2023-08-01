@@ -9,7 +9,7 @@ import jwt from 'jsonwebtoken'
 export const POST = async ({ request }) => {
     // const { message, signature, treatments } = await request.json()
     // console.log(request.headers);
-    const { treatments, address } = await request.json()
+    const { treatments, wallet } = await request.json()
     const token = request.headers.get('token')
     console.log({ treatments, token });
     // const siweMessage = new SiweMessage(message)
@@ -26,11 +26,11 @@ export const POST = async ({ request }) => {
             for (const element of treatments) {
                 const treatment = new ethers.Contract(element, Treatment.abi, networkProviders[0].getSigner())
                 try {
-                    let res = await treatment.hasRole('0x72606200fac42b7dc86b75901d61ecfab2a4a1a6eded478b97a428094891abed', address)
+                    let res = await treatment.hasRole('0x72606200fac42b7dc86b75901d61ecfab2a4a1a6eded478b97a428094891abed', wallet)
                     //validate patient
                     if (res) {
                         //add the log to db
-                        let [result, error] = await db.execute(`INSERT INTO log (patient_address, treatment_address) VALUES(?, ?)`, [address, element])
+                        let [result, error] = await db.execute(`INSERT INTO log (patient_address, treatment_address) VALUES(?, ?)`, [wallet, element])
                         if (error) {
                             failed.push(element)
                         } else {
@@ -46,31 +46,6 @@ export const POST = async ({ request }) => {
                     failed.push(element)
                 }
             }
-            // treatments.forEach(async element => {
-            //     //grab the contract
-            //     const treatment = new ethers.Contract(element, Treatment.abi, networkProviders[0].getSigner())
-            //     try {
-            //         let res = await treatment.getPatient()
-            //         //validate patient
-            //         if (res === siweMessage.address) {
-            //             //add the log to db
-            //             let [result, error] = await db.execute(`INSERT INTO log (patient_address, treatment_address) VALUES(?, ?)`, [siweMessage.address, element])
-            //             if (error) {
-            //                 failed.push(element)
-            //             } else {
-            //                 console.log(result);
-            //                 success.push(element)
-            //             }
-            //         } else {
-            //             //add address to failed
-            //             failed.push(element)
-            //         }
-            //     } catch (error) {
-            //         console.log(error);
-            //         failed.push(element)
-            //     }
-            // });
-            //return success and failed
             closeConnection()
             return new Response(JSON.stringify({ success, failed }))
         } else {

@@ -249,7 +249,6 @@
 					tempUpdates.push('Error decrypting');
 				}
 			}
-					tempUpdates.push('Error decrypting');
 			profileUpdates = tempUpdates;
 			console.log({ profileUpdates });
 		} catch (error) {
